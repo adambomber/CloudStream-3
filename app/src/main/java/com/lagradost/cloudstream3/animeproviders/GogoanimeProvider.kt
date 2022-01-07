@@ -86,7 +86,37 @@ class GogoanimeProvider : MainAPI() {
                         if (!isSub) epNum.toIntOrNull() else null,
                         if (isSub) epNum.toIntOrNull() else null,
                     )
-                }).toList()))
+                }).toList(), 1, true) {
+                    try {
+                        val p = mapOf("page" to it.toString(), "type" to i.first)
+                        val pHtml = app.get(
+                            "https://ajax.gogo-load.com/ajax/page-recent-release.html",
+                            headers = headers,
+                            params = p
+                        )
+
+                        Pair((parseRegex.findAll(pHtml.text).map { match ->
+                            val (link, epNum, title, poster) = match.destructured
+                            val isSub = listOf(1, 3).contains(i.first.toInt())
+                            AnimeSearchResponse(
+                                title,
+                                link,
+                                this.name,
+                                TvType.Anime,
+                                poster,
+                                null,
+                                if (isSub) EnumSet.of(DubStatus.Subbed) else EnumSet.of(
+                                    DubStatus.Dubbed
+                                ),
+                                null,
+                                if (!isSub) epNum.toIntOrNull() else null,
+                                if (isSub) epNum.toIntOrNull() else null,
+                            )
+                        }).toList(), true)
+                    } catch (e: Exception) {
+                        Pair(null, false)
+                    }
+                })
             } catch (e: Exception) {
                 e.printStackTrace()
             }

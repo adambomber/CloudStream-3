@@ -10,6 +10,9 @@ import com.lagradost.cloudstream3.HomePageList
 import com.lagradost.cloudstream3.R
 import com.lagradost.cloudstream3.ui.search.SearchClickCallback
 import kotlinx.android.synthetic.main.homepage_parent.view.*
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.lagradost.cloudstream3.SearchResponse
+
 
 class ParentItemAdapter(
     var items: List<HomePageList>,
@@ -44,7 +47,13 @@ class ParentItemAdapter(
         RecyclerView.ViewHolder(itemView) {
         val title: TextView = itemView.home_parent_item_title
         val recyclerView: RecyclerView = itemView.home_child_recyclerview
+        val layoutManager = recyclerView.layoutManager as LinearLayoutManager?
+
+        var isLoading: Boolean = false
+
+
         private val moreInfo: FrameLayout = itemView.home_child_more_info
+
         fun bind(info: HomePageList) {
             title.text = info.name
             recyclerView.adapter = HomeChildItemAdapter(
@@ -57,6 +66,36 @@ class ParentItemAdapter(
 
             moreInfo.setOnClickListener {
                 moreInfoClickCallback.invoke(info)
+            }
+
+            if (info.hasNextPage) {
+                recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                        if (layoutManager != null) {
+                            val lastVisibleItem = layoutManager.findLastVisibleItemPosition() + 1
+                            val itemCount = layoutManager.itemCount
+
+                            println("wooosh:: $lastVisibleItem, $itemCount")
+
+                            if (lastVisibleItem == itemCount && !isLoading && info.page != null && info.getNextPage != null) {
+                                println("getting more items")
+                                isLoading = true
+                                val newItems = info.getNextPage.invoke(info.page!! +1)
+                                info.hasNextPage = newItems.second
+                                if (newItems.first == null) {
+                                    println("no items to get")
+                                    isLoading = false
+                                    info.hasNextPage = false
+                                    return
+                                }
+                                info.list = info.list + newItems.first!!
+                                info.page = info.page!! + 1
+                                isLoading = false
+                                println("finished getting more items.")
+                            }
+                        }
+                    }
+                })
             }
         }
     }

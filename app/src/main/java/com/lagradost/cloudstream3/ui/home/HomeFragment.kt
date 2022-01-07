@@ -608,7 +608,7 @@ class HomeFragment : Fragment() {
             homeViewModel.loadAndCancel(apiName)
         }
 
-        home_loaded.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { view, _, scrollY, _, oldScrollY ->
+        home_loaded.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { view, scrollX, scrollY, oldScrollX, oldScrollY ->
             val dy = scrollY - oldScrollY
             if (dy > 0) { //check for scroll down
                 home_api_fab?.hide()
@@ -618,6 +618,7 @@ class HomeFragment : Fragment() {
                 }
             }
         })
+
 
         // nice profile pic on homepage
         home_profile_picture_holder?.isVisible = false

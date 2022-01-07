@@ -385,7 +385,10 @@ class HomePageResponse(
 
 class HomePageList(
     val name: String,
-    var list: List<SearchResponse>
+    var list: List<SearchResponse>,
+    var page: Int? = null,
+    var hasNextPage: Boolean = false,
+    val getNextPage: ((Int) -> Pair<List<SearchResponse>?, Boolean>)? = null
 )
 
 interface SearchResponse {
