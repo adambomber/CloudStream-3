@@ -608,7 +608,7 @@ class HomeFragment : Fragment() {
             homeViewModel.loadAndCancel(apiName)
         }
 
-        home_loaded.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { view, scrollX, scrollY, oldScrollX, oldScrollY ->
+        home_loaded.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { view, _, scrollY, _, oldScrollY ->
             val dy = scrollY - oldScrollY
             if (dy > 0) { //check for scroll down
                 home_api_fab?.hide()
