@@ -11,7 +11,6 @@ import com.lagradost.cloudstream3.R
 import com.lagradost.cloudstream3.ui.search.SearchClickCallback
 import kotlinx.android.synthetic.main.homepage_parent.view.*
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.lagradost.cloudstream3.mvvm.safeApiCall
 import kotlin.concurrent.thread
 
 
@@ -74,8 +73,6 @@ class ParentItemAdapter(
                     if (layoutManager != null) {
                         val lastVisibleItem = layoutManager.findLastVisibleItemPosition() + 1
                         val itemCount = layoutManager.itemCount
-
-                        println("wooosh:: $lastVisibleItem, $itemCount")
 
                         if (lastVisibleItem == itemCount && !isLoading && info.page != null && info.getNextPage != null && info.hasNextPage) {
                             println("getting more items")
