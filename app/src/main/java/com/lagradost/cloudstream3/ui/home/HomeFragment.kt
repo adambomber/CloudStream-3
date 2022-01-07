@@ -377,7 +377,7 @@ class HomeFragment : Fragment() {
                     (home_master_recycler?.adapter as ParentItemAdapter?)?.items =
                         d?.items?.mapNotNull {
                             try {
-                                HomePageList(it.name, it.list.filterSearchResponse())
+                                it.copy(list=it.list.filterSearchResponse())
                             } catch (e: Exception) {
                                 logError(e)
                                 null

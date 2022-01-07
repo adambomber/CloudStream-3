@@ -11,7 +11,8 @@ import com.lagradost.cloudstream3.R
 import com.lagradost.cloudstream3.ui.search.SearchClickCallback
 import kotlinx.android.synthetic.main.homepage_parent.view.*
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.lagradost.cloudstream3.SearchResponse
+import com.lagradost.cloudstream3.mvvm.safeApiCall
+import kotlin.concurrent.thread
 
 
 class ParentItemAdapter(
@@ -68,35 +69,36 @@ class ParentItemAdapter(
                 moreInfoClickCallback.invoke(info)
             }
 
-            if (info.hasNextPage) {
-                recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
-                    override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                        if (layoutManager != null) {
-                            val lastVisibleItem = layoutManager.findLastVisibleItemPosition() + 1
-                            val itemCount = layoutManager.itemCount
+            recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                    if (layoutManager != null) {
+                        val lastVisibleItem = layoutManager.findLastVisibleItemPosition() + 1
+                        val itemCount = layoutManager.itemCount
 
-                            println("wooosh:: $lastVisibleItem, $itemCount")
+                        println("wooosh:: $lastVisibleItem, $itemCount")
 
-                            if (lastVisibleItem == itemCount && !isLoading && info.page != null && info.getNextPage != null) {
-                                println("getting more items")
-                                isLoading = true
+                        if (lastVisibleItem == itemCount && !isLoading && info.page != null && info.getNextPage != null && info.hasNextPage) {
+                            println("getting more items")
+                            isLoading = true
+                            thread {
                                 val newItems = info.getNextPage.invoke(info.page!! +1)
                                 info.hasNextPage = newItems.second
                                 if (newItems.first == null) {
                                     println("no items to get")
                                     isLoading = false
                                     info.hasNextPage = false
-                                    return
+                                } else {
+                                    info.list = info.list + newItems.first!!
+                                    info.page = info.page!! + 1
+                                    isLoading = false
+                                    (recyclerView.adapter as HomeChildItemAdapter ).cardList = info.list
+                                    println("finished getting more items.")
                                 }
-                                info.list = info.list + newItems.first!!
-                                info.page = info.page!! + 1
-                                isLoading = false
-                                println("finished getting more items.")
                             }
                         }
                     }
-                })
-            }
+                }
+            })
         }
     }
 }

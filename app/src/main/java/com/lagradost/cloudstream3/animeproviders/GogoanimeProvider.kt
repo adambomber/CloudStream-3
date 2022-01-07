@@ -53,6 +53,27 @@ class GogoanimeProvider : MainAPI() {
         )
         val parseRegex =
             Regex("""<li>\s*\n.*\n.*<a\s*href=["'](.*?-episode-(\d+))["']\s*title=["'](.*?)["']>\n.*?img src="(.*?)"""")
+        fun parsePage(html: String, i: Pair<String, String>): List<SearchResponse> {
+            return (parseRegex.findAll(html).map {
+                val (link, epNum, title, poster) = it.destructured
+                val isSub = listOf(1, 3).contains(i.first.toInt())
+                AnimeSearchResponse(
+                    title,
+                    fixUrl(link),
+                    this.name,
+                    TvType.Anime,
+                    poster,
+                    null,
+                    if (isSub) EnumSet.of(DubStatus.Subbed) else EnumSet.of(
+                        DubStatus.Dubbed
+                    ),
+                    null,
+                    if (!isSub) epNum.toIntOrNull() else null,
+                    if (isSub) epNum.toIntOrNull() else null,
+                )
+            }).toList()
+        }
+
 
         val urls = listOf(
             Pair("1", "Recent Release - Sub"),
@@ -69,53 +90,25 @@ class GogoanimeProvider : MainAPI() {
                     headers = headers,
                     params = params
                 )
-                items.add(HomePageList(i.second, (parseRegex.findAll(html.text).map {
-                    val (link, epNum, title, poster) = it.destructured
-                    val isSub = listOf(1, 3).contains(i.first.toInt())
-                    AnimeSearchResponse(
-                        title,
-                        link,
-                        this.name,
-                        TvType.Anime,
-                        poster,
-                        null,
-                        if (isSub) EnumSet.of(DubStatus.Subbed) else EnumSet.of(
-                            DubStatus.Dubbed
-                        ),
-                        null,
-                        if (!isSub) epNum.toIntOrNull() else null,
-                        if (isSub) epNum.toIntOrNull() else null,
-                    )
-                }).toList(), 1, true) {
-                    try {
-                        val p = mapOf("page" to it.toString(), "type" to i.first)
-                        val pHtml = app.get(
-                            "https://ajax.gogo-load.com/ajax/page-recent-release.html",
-                            headers = headers,
-                            params = p
-                        )
-
-                        Pair((parseRegex.findAll(pHtml.text).map { match ->
-                            val (link, epNum, title, poster) = match.destructured
-                            val isSub = listOf(1, 3).contains(i.first.toInt())
-                            AnimeSearchResponse(
-                                title,
-                                link,
-                                this.name,
-                                TvType.Anime,
-                                poster,
-                                null,
-                                if (isSub) EnumSet.of(DubStatus.Subbed) else EnumSet.of(
-                                    DubStatus.Dubbed
-                                ),
-                                null,
-                                if (!isSub) epNum.toIntOrNull() else null,
-                                if (isSub) epNum.toIntOrNull() else null,
+                items.add(
+                    HomePageList(
+                        i.second,
+                        parsePage(html.text, i),
+                        1,
+                        true
+                    ) {
+                        try {
+                            val p = mapOf("page" to it.toString(), "type" to i.first)
+                            val pHtml = app.get(
+                                "https://ajax.gogo-load.com/ajax/page-recent-release.html",
+                                headers = headers,
+                                params = p
                             )
-                        }).toList(), true)
-                    } catch (e: Exception) {
-                        Pair(null, false)
-                    }
+                            Pair(parsePage(pHtml.text, i), true)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                            Pair(null, false)
+                       }
                 })
             } catch (e: Exception) {
                 e.printStackTrace()

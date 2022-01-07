@@ -379,11 +379,11 @@ fun TvType.isMovieType(): Boolean {
 
 data class SubtitleFile(val lang: String, val url: String)
 
-class HomePageResponse(
+data class HomePageResponse(
     val items: List<HomePageList>
 )
 
-class HomePageList(
+data class HomePageList(
     val name: String,
     var list: List<SearchResponse>,
     var page: Int? = null,
