@@ -4,9 +4,15 @@ import android.content.ComponentName
 import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Configuration
+import android.graphics.Color
 import android.os.Bundle
+import android.util.TypedValue
 import android.view.KeyEvent
+import android.view.View
+import android.view.ViewParent
 import android.view.WindowManager
+import android.widget.ImageView
+import android.widget.ScrollView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.navigation.NavDestination
@@ -47,6 +53,7 @@ import com.lagradost.cloudstream3.utils.UIHelper.getResourceColor
 import com.lagradost.cloudstream3.utils.UIHelper.hideKeyboard
 import com.lagradost.cloudstream3.utils.UIHelper.navigate
 import com.lagradost.cloudstream3.utils.UIHelper.requestRW
+import com.owen.focus.FocusBorder
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_result.*
 import java.io.File
@@ -70,6 +77,10 @@ var app = Requests()
 
 
 class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
+    companion object {
+        var mColorFocusBorder: FocusBorder? = null
+    }
+
     override fun onColorSelected(dialogId: Int, color: Int) {
         onColorSelectedEvent.invoke(Pair(dialogId, color))
     }
@@ -174,7 +185,6 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
         }
     }
 
-
     override fun dispatchKeyEvent(event: KeyEvent?): Boolean {
         CommonActivity.dispatchKeyEvent(this, event)?.let {
             return it
@@ -262,6 +272,86 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
                     }
                 }
             }
+        }
+    }
+
+    private fun initBorder() {
+
+
+        /** 颜色焦点框  */
+        mColorFocusBorder = FocusBorder.Builder().asColor() //阴影宽度(方法shadowWidth(18f)也可以设置阴影宽度)
+            .shadowWidth(TypedValue.COMPLEX_UNIT_DIP, 0.1f) //阴影颜色
+            .shadowColor(Color.WHITE) //边框宽度(方法borderWidth(2f)也可以设置边框宽度)
+            .borderWidth(TypedValue.COMPLEX_UNIT_DIP, 3.2f) //边框颜色
+            .borderColor(Color.WHITE) //padding值
+            .padding(2f) //动画时长
+            .animDuration(300) //不要闪光动画
+            //.noShimmer() //闪光颜色
+            .shimmerColor(Color.argb(50, 255, 255, 255)) //闪光动画时长
+            .shimmerDuration(1000)
+            .build(this)
+
+        //焦点监听 方式一:绑定整个页面的焦点监听事件
+        //mColorFocusBorder?.boundGlobalFocusListener(FocusBorder.OnFocusCallback { oldFocus, newFocus ->
+        //    println("NEWFOCUS : $oldFocus $newFocus")
+        //    if (null != newFocus) {
+        //        when (newFocus.id) {
+        //            R.id.home_watch_child_recyclerview, R.id.home_bookmarked_child_recyclerview -> {
+        //                val scale = 1.2f
+        //                return@OnFocusCallback FocusBorder.OptionsFactory.get(
+        //                    scale,
+        //                    scale,
+        //                    android.R.attr.radius.toPx * scale
+        //                )
+        //            }
+        //            else -> {}
+        //        }
+        //    }
+        //    //返回null表示不使用焦点框框架
+        //    null
+        //})
+
+
+//焦点监听 方式二:单个的焦点监听事件
+        //view.onFocusChangeListener = OnFocusChangeListener { v, hasFocus ->
+        //    println("VIEW: $v in $hasFocus")
+        //    if (hasFocus) {
+        //        mColorFocusBorder.onFocus(v, FocusBorder.OptionsFactory.get(1.2f, 1.2f))
+        //    }
+        //}
+
+        homeRoot.viewTreeObserver.addOnGlobalFocusChangeListener { oldFocus, newFocus ->
+            //mColorFocusBorder?.onFocus(newFocus, FocusBorder.OptionsFactory.get(1f, 1f))
+            if (isValidSelectionView(newFocus)) {
+                if (!isValidSelectionView(oldFocus)) {
+                    mColorFocusBorder?.setVisible(true, true)
+                }
+                //newFocus.parent.onNestedScroll(newFocus,)
+                //val currentParent = getFirstScrollParent(newFocus)
+                //currentParent?.scr
+                mColorFocusBorder?.onFocus(newFocus, FocusBorder.OptionsFactory.get(1f, 1f))
+            } else {
+                mColorFocusBorder?.setVisible(false, true)
+            }
+        }
+    }
+
+    private fun getFirstScrollParent(view: View?) : ViewParent? {
+        if(view == null) {
+            return null
+        }
+        var currentParent = view.parent
+        while (currentParent != null && currentParent !is ScrollView) {
+            currentParent = currentParent.parent
+        }
+        return currentParent
+    }
+
+    private fun isValidSelectionView(view: View?): Boolean {
+        return when (view) {
+            is ImageView -> false
+            null -> false
+            else -> true
         }
     }
 
@@ -453,7 +543,7 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
         } catch (e: Exception) {
             logError(e)
         }
-
+        initBorder()
 /*
         val relativePath = (Environment.DIRECTORY_DOWNLOADS) + File.separatorChar
         val displayName = "output.dex" //""output.dex"

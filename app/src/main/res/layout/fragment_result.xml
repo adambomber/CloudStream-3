@@ -766,7 +766,7 @@
                         </LinearLayout>
 
                         <com.facebook.shimmer.ShimmerFrameLayout
-                                tools:visibility="visible"
+                                tools:visibility="gone"
                                 app:shimmer_base_alpha="0.2"
                                 app:shimmer_highlight_alpha="0.3"
                                 app:shimmer_duration="@integer/loading_time"
@@ -800,7 +800,11 @@
                                 android:layout_width="50dp"
                                 android:layout_height="50dp" />-->
 
-                        <androidx.recyclerview.widget.RecyclerView
+                        <com.owen.tvrecyclerview.widget.TvRecyclerView
+                                app:tv_layoutManager="V7LinearLayoutManager"
+                                app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                                tools:visibility="visible"
+                                android:orientation="vertical"
                                 android:descendantFocusability="afterDescendants"
                                 android:id="@+id/result_episodes"
                                 android:clipToPadding="false"

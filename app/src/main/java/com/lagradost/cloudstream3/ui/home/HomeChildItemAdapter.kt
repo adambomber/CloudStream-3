@@ -15,8 +15,7 @@ class HomeChildItemAdapter(
     private val nextFocusUp: Int? = null,
     private val nextFocusDown: Int? = null,
     private val clickCallback: (SearchClickCallback) -> Unit,
-) :
-    RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return CardViewHolder(

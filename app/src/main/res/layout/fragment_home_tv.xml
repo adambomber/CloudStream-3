@@ -255,7 +255,7 @@
                 </ImageView>
             </FrameLayout>
 
-            <LinearLayout
+           <!-- <LinearLayout
                     android:layout_marginTop="10dp"
                     android:id="@+id/home_main_holder"
                     android:orientation="vertical"
@@ -263,83 +263,15 @@
                     android:layout_height="wrap_content">
 
                 <com.owen.tvrecyclerview.widget.TvRecyclerView
+                        app:tv_selectedItemIsCentered="true"
                         android:nextFocusUp="@id/home_change_api"
                         android:nextFocusDown="@id/home_main_info"
                         style="@style/TvList"
 
-                        android:paddingStart="148dp"
-                        android:paddingEnd="148dp"
-
                         android:id="@+id/home_main_poster_recyclerview"
                         tools:listitem="@layout/home_result_grid" />
-                <!--<ImageView
-                        android:foreground="@drawable/outline_drawable"
-                        android:id="@+id/home_main_poster"
-                        tools:src="@drawable/example_poster"
-                        android:layout_gravity="center"
-                        android:scaleType="centerCrop"
-                        android:layout_width="150dp"
-                        android:layout_height="212dp"
-                        android:contentDescription="@string/home_main_poster_img_des">
-                </ImageView>-->
-                <TextView
-                        android:id="@+id/home_main_text"
-                        android:layout_gravity="center"
-                        android:gravity="center"
-                        tools:text="Perfect Run"
-                        android:textStyle="bold"
-                        android:layout_margin="5dp"
-                        android:textSize="15sp"
-                        android:textColor="?attr/textColor"
-                        android:layout_width="match_parent"
-                        android:maxLines="2"
-                        android:ellipsize="end"
-                        android:layout_height="40sp" />
 
-                <LinearLayout
-                        android:padding="5dp"
-                        android:layout_gravity="center"
-                        android:gravity="center"
-                        android:orientation="horizontal"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
-
-                    <com.google.android.material.button.MaterialButton
-                            android:nextFocusLeft="@id/nav_rail_view"
-                            android:nextFocusUp="@id/home_main_poster_recyclerview"
-                            android:nextFocusRight="@id/home_main_info"
-                            android:nextFocusDown="@id/home_watch_child_more_info"
-
-                            style="@style/WhiteButton"
-                            android:visibility="visible"
-                            android:layout_gravity="center"
-                            android:id="@+id/home_main_play"
-                            android:text="@string/home_play"
-
-                            app:icon="@drawable/ic_baseline_play_arrow_24"
-                            android:minWidth="120dp"
-                            android:layout_width="wrap_content" />
-
-                    <com.google.android.material.button.MaterialButton
-                            android:nextFocusLeft="@id/home_main_play"
-                            android:nextFocusUp="@id/home_main_poster_recyclerview"
-                            android:nextFocusRight="@id/home_change_api"
-                            android:nextFocusDown="@id/home_watch_child_more_info"
-
-                            style="@style/BlackButton"
-                            android:visibility="visible"
-                            android:layout_gravity="center"
-                            android:text="@string/home_info"
-                            app:icon="@drawable/ic_outline_info_24"
-
-                            android:id="@+id/home_main_info"
-                            android:clickable="true"
-                            android:focusable="true"
-
-                            android:minWidth="120dp"
-                            android:layout_width="wrap_content" />
-                </LinearLayout>
-            </LinearLayout>
+            </LinearLayout>-->
 
             <LinearLayout
                     android:id="@+id/home_watch_holder"
@@ -378,6 +310,7 @@
 
 
                 <com.owen.tvrecyclerview.widget.TvRecyclerView
+                        app:tv_isMenu="true"
                         style="@style/TvList"
                         android:id="@+id/home_watch_child_recyclerview"
                         tools:listitem="@layout/home_result_grid" />

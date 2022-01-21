@@ -27,4 +27,8 @@
         <attr name="iconColor" format="color"/>
         <attr name="white" format="color"/>
     </declare-styleable>
+    <declare-styleable name="CustomTv">
+    <attr name="tv_verticalSpacingWithMargins">5dp</attr>
+    <attr name="tv_horizontalSpacingWithMargins">5dp</attr>
+    </declare-styleable>
 </resources>
