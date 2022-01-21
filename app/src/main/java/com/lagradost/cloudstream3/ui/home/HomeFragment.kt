@@ -478,8 +478,8 @@ class HomeFragment : Fragment() {
                 val list = EnumSet.noneOf(WatchType::class.java)
                 itemView.context.getKey<IntArray>(HOME_BOOKMARK_VALUE_LIST)
                     ?.map { WatchType.fromInternalId(it) }?.let {
-                    list.addAll(it)
-                }
+                        list.addAll(it)
+                    }
 
                 if (list.contains(watch)) {
                     list.remove(watch)
@@ -526,14 +526,15 @@ class HomeFragment : Fragment() {
                 bookmarks
             home_bookmarked_child_recyclerview?.adapter?.notifyDataSetChanged()
 
-            home_bookmarked_child_more_info?.setOnClickListener {
-                activity?.loadHomepageList(
-                    HomePageList(
-                        getString(R.string.error_bookmarks_text), //home_bookmarked_parent_item_title?.text?.toString() ?: getString(R.string.error_bookmarks_text),
-                        bookmarks
+            if (context?.isTvSettings() == false)
+                home_bookmarked_child_more_info?.setOnClickListener {
+                    activity?.loadHomepageList(
+                        HomePageList(
+                            getString(R.string.error_bookmarks_text), //home_bookmarked_parent_item_title?.text?.toString() ?: getString(R.string.error_bookmarks_text),
+                            bookmarks
+                        )
                     )
-                )
-            }
+                }
         }
 
         observe(homeViewModel.resumeWatching) { resumeWatching ->
@@ -542,15 +543,16 @@ class HomeFragment : Fragment() {
                 resumeWatching
             home_watch_child_recyclerview?.adapter?.notifyDataSetChanged()
 
-            home_watch_child_more_info?.setOnClickListener {
-                activity?.loadHomepageList(
-                    HomePageList(
-                        home_watch_parent_item_title?.text?.toString()
-                            ?: getString(R.string.continue_watching),
-                        resumeWatching
+            if (context?.isTvSettings() == false)
+                home_watch_child_more_info?.setOnClickListener {
+                    activity?.loadHomepageList(
+                        HomePageList(
+                            home_watch_parent_item_title?.text?.toString()
+                                ?: getString(R.string.continue_watching),
+                            resumeWatching
+                        )
                     )
-                )
-            }
+                }
         }
 
         home_bookmarked_child_recyclerview.adapter = HomeChildItemAdapter(
@@ -626,14 +628,16 @@ class HomeFragment : Fragment() {
         home_master_recycler.adapter = adapter
         home_master_recycler.layoutManager = GridLayoutManager(context, 1)
 
-        if(context?.isTvSettings() == true) {
-           // home_main_poster_recyclerview?.layoutManager = LinearLayoutManager(context)
+        if (context?.isTvSettings() == true) {
+            // home_main_poster_recyclerview?.layoutManager = LinearLayoutManager(context)
         } else {
             LinearSnapHelper().attachToRecyclerView(home_main_poster_recyclerview) // snap
             val centerLayoutManager =
                 CenterZoomLayoutManager(context, LinearLayoutManager.HORIZONTAL, false)
             centerLayoutManager.setOnSizeListener { index ->
-                (home_main_poster_recyclerview?.adapter as HomeChildItemAdapter?)?.cardList?.get(index)
+                (home_main_poster_recyclerview?.adapter as HomeChildItemAdapter?)?.cardList?.get(
+                    index
+                )
                     ?.let { random ->
                         home_main_play.setOnClickListener {
                             activity.loadSearchResult(random, START_ACTION_RESUME_LATEST)

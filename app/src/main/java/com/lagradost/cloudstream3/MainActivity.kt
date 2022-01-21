@@ -5,6 +5,7 @@ import android.content.Intent
 import android.content.res.ColorStateList
 import android.content.res.Configuration
 import android.graphics.Color
+import android.os.Build
 import android.os.Bundle
 import android.util.TypedValue
 import android.view.KeyEvent
@@ -53,8 +54,10 @@ import com.lagradost.cloudstream3.utils.UIHelper.getResourceColor
 import com.lagradost.cloudstream3.utils.UIHelper.hideKeyboard
 import com.lagradost.cloudstream3.utils.UIHelper.navigate
 import com.lagradost.cloudstream3.utils.UIHelper.requestRW
+import com.owen.focus.ColorFocusBorder
 import com.owen.focus.FocusBorder
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.fragment_home.*
 import kotlinx.android.synthetic.main.fragment_result.*
 import java.io.File
 import kotlin.concurrent.thread
@@ -279,7 +282,7 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
 
 
         /** 颜色焦点框  */
-        mColorFocusBorder = FocusBorder.Builder().asColor() //阴影宽度(方法shadowWidth(18f)也可以设置阴影宽度)
+        mColorFocusBorder = ColorFocusBorder.Builder() //阴影宽度(方法shadowWidth(18f)也可以设置阴影宽度)
             .shadowWidth(TypedValue.COMPLEX_UNIT_DIP, 0.1f) //阴影颜色
             .shadowColor(Color.WHITE) //边框宽度(方法borderWidth(2f)也可以设置边框宽度)
             .borderWidth(TypedValue.COMPLEX_UNIT_DIP, 3.2f) //边框颜色
@@ -290,7 +293,6 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
             .shimmerColor(Color.argb(50, 255, 255, 255)) //闪光动画时长
             .shimmerDuration(1000)
             .build(this)
-
         //焦点监听 方式一:绑定整个页面的焦点监听事件
         //mColorFocusBorder?.boundGlobalFocusListener(FocusBorder.OnFocusCallback { oldFocus, newFocus ->
         //    println("NEWFOCUS : $oldFocus $newFocus")
@@ -319,25 +321,33 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
         //        mColorFocusBorder.onFocus(v, FocusBorder.OptionsFactory.get(1.2f, 1.2f))
         //    }
         //}
-
         homeRoot.viewTreeObserver.addOnGlobalFocusChangeListener { oldFocus, newFocus ->
-            //mColorFocusBorder?.onFocus(newFocus, FocusBorder.OptionsFactory.get(1f, 1f))
-            if (isValidSelectionView(newFocus)) {
-                if (!isValidSelectionView(oldFocus)) {
-                    mColorFocusBorder?.setVisible(true, true)
-                }
-                //newFocus.parent.onNestedScroll(newFocus,)
-                //val currentParent = getFirstScrollParent(newFocus)
-                //currentParent?.scr
-                mColorFocusBorder?.onFocus(newFocus, FocusBorder.OptionsFactory.get(1f, 1f))
-            } else {
-                mColorFocusBorder?.setVisible(false, true)
+            changeFocus(oldFocus, newFocus)
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            home_loaded?.setOnScrollChangeListener { _, _, _, _, _ ->
+                changeFocus(currentFocus, currentFocus)
             }
         }
     }
 
-    private fun getFirstScrollParent(view: View?) : ViewParent? {
-        if(view == null) {
+    // var oldFocus: View? = null
+    private fun changeFocus(oldFocus: View?, newFocus: View?) {
+        if (newFocus != null && isValidSelectionView(newFocus)) {
+            if (!isValidSelectionView(oldFocus)) {
+                mColorFocusBorder?.setVisible(true, true)
+            }
+            //homeRoot.onNestedScroll(newFocus, 0, 0, 0, 0)
+
+            // + min(Resources.getSystem().displayMetrics.widthPixels, Resources.getSystem().displayMetrics.heightPixels) / 2
+            mColorFocusBorder?.onFocus(newFocus, FocusBorder.OptionsFactory.get(1f, 1f))
+        } else {
+            mColorFocusBorder?.setVisible(false, true)
+        }
+    }
+
+    private fun getFirstScrollParent(view: View?): ViewParent? {
+        if (view == null) {
             return null
         }
         var currentParent = view.parent

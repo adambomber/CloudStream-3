@@ -304,6 +304,7 @@
 
     <style name="TvList">
         <item name="tv_selectedItemIsCentered">true</item>
+        <item name="tv_isMemoryFocus">true</item>
         <item name="tv_horizontalSpacingWithMargins">5dp</item>
         <item name="tv_verticalSpacingWithMargins">5dp</item>
         <item name="tv_layoutManager">V7LinearLayoutManager</item>
