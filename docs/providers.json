@@ -165,11 +165,6 @@
         "status": 1,
         "url": "https://elifilms.net"
     },
-    "EntrePeliculasySeriesProvider": {
-        "name": "EntrePeliculasySeries",
-        "status": 1,
-        "url": "https://entrepeliculasyseries.nu"
-    },
     "EntrepeliculasyseriesProvider": {
         "language": "es",
         "name": "EntrePeliculasySeries",
