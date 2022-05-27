@@ -123,6 +123,24 @@ object APIHolder {
             //MultiAnimeProvider(),
 	        NginxProvider(),
             OlgplyProvider(),
+
+            // Additional anime providers
+            AnimefenixProvider(),
+            AnimeflvIOProvider(),
+            AnimeIDProvider(),
+            AnimeonlineProvider(),
+            JKAnimeProvider(),
+            KrunchyProvider(),
+            MundoDonghuaProvider(),
+            TioAnimeProvider(),
+
+            // Additional movie providers
+            ComamosRamenProvider(),
+            ElifilmsProvider(),
+            EstrenosDoramasProvider(),
+            FmoviesAPPProvider(),
+            PelisplusSOProvider(),
+            YesMoviesProvider(),
         )
     }
 
@@ -548,8 +566,10 @@ enum class ShowStatus {
 }
 
 enum class DubStatus(val id: Int) {
-    Dubbed(1),
     Subbed(0),
+    PremiumSub(1),
+    Dubbed(2),
+    PremiumDub(3),
 }
 
 enum class TvType {
@@ -561,6 +581,8 @@ enum class TvType {
     OVA,
     Torrent,
     Documentary,
+    Mirror,
+    Donghua,
     AsianDrama,
 }
 
@@ -571,7 +593,7 @@ fun TvType.isMovieType(): Boolean {
 
 // returns if the type has an anime opening
 fun TvType.isAnimeOp(): Boolean {
-    return this == TvType.Anime || this == TvType.OVA
+    return this == TvType.Anime || this == TvType.OVA || this == TvType.Donghua
 }
 
 data class SubtitleFile(val lang: String, val url: String)
