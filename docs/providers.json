@@ -197,7 +197,7 @@
     "FmoviesAPPProvider": {
         "language": "en",
         "name": "Fmovies",
-        "status": 0,
+        "status": 1,
         "url": "https://fmovies.app"
     },
     "FmoviesToProvider": {
