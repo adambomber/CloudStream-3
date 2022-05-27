@@ -107,7 +107,6 @@
         "url": "https://m.comamosramen.com"
     },
     "CrossTmdbProvider": {
-         "language": "en",
         "name": "MultiMovie",
         "status": 1,
         "url": "NONE"
@@ -167,7 +166,6 @@
         "url": "https://elifilms.net"
     },
     "EntrePeliculasySeriesProvider": {
-         "language": "es",
         "name": "EntrePeliculasySeries",
         "status": 1,
         "url": "https://entrepeliculasyseries.nu"
@@ -233,7 +231,6 @@
         "url": "https://hdm.to"
     },
     "HDTodayProvider": {
-         "language": "en",
         "name": "HDToday",
         "status": 1,
         "url": "https://hdtoday.tv"
@@ -305,13 +302,11 @@
         "url": "https://monoschinos2.com"
     },
     "MoviesJoyProvider": {
-         "language": "en",
         "name": "Moviesjoy",
         "status": 1,
         "url": "https://moviesjoy.to"
     },
     "MultiAnimeProvider": {
-         "language": "en",
         "name": "MultiAnime",
         "status": 1,
         "url": ""
@@ -329,7 +324,6 @@
         "url": "https://mycima.tv"
     },
     "MyflixerToProvider": {
-         "language": "en",
         "name": "MyFlixer",
         "status": 1,
         "url": "https://myflixertv.to"
@@ -490,7 +484,6 @@
         "url": "https://tioanime.com"
     },
     "TmdbProvider": {
-         "language": "en",
         "name": "Tmdb",
         "status": 1,
         "url": ""
@@ -550,7 +543,6 @@
         "url": "https://wcostream.cc"
     },
     "YesMoviesProvider": {
-         "language": "en",
         "name": "YesMovies",
         "status": 1,
         "url": "https://yesmovies.mn"
