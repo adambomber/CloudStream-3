@@ -107,6 +107,7 @@
         "url": "https://m.comamosramen.com"
     },
     "CrossTmdbProvider": {
+         "language": "en",
         "name": "MultiMovie",
         "status": 1,
         "url": "NONE"
@@ -166,6 +167,7 @@
         "url": "https://elifilms.net"
     },
     "EntrePeliculasySeriesProvider": {
+         "language": "es",
         "name": "EntrePeliculasySeries",
         "status": 1,
         "url": "https://entrepeliculasyseries.nu"
@@ -231,14 +233,10 @@
         "url": "https://hdm.to"
     },
     "HDTodayProvider": {
+         "language": "en",
         "name": "HDToday",
         "status": 1,
         "url": "https://hdtoday.tv"
-    },
-    "HenaojaraProvider": {
-        "name": "Henaojara",
-        "status": 1,
-        "url": "https://henaojara.com"
     },
     "IHaveNoTvProvider": {
         "language": "en",
@@ -282,11 +280,6 @@
         "status": 1,
         "url": "https://185.231.223.254"
     },
-    "LayarKaca21Provider": {
-        "name": "LayarKaca",
-        "status": 1,
-        "url": "https://149.56.24.226/"
-    },
     "LayarKacaProvider": {
         "language": "id",
         "name": "LayarKaca",
@@ -312,11 +305,13 @@
         "url": "https://monoschinos2.com"
     },
     "MoviesJoyProvider": {
+         "language": "en",
         "name": "Moviesjoy",
         "status": 1,
         "url": "https://moviesjoy.to"
     },
     "MultiAnimeProvider": {
+         "language": "en",
         "name": "MultiAnime",
         "status": 1,
         "url": ""
@@ -334,6 +329,7 @@
         "url": "https://mycima.tv"
     },
     "MyflixerToProvider": {
+         "language": "en",
         "name": "MyFlixer",
         "status": 1,
         "url": "https://myflixertv.to"
@@ -469,11 +465,6 @@
         "status": 1,
         "url": "https://streamingcommunity.top"
     },
-    "TantiFilmProvider": {
-        "name": "TantiFilm",
-        "status": 1,
-        "url": "https://www.tantifilm.rodeo"
-    },
     "TantifilmProvider": {
         "language": "it",
         "name": "Tantifilm",
@@ -499,6 +490,7 @@
         "url": "https://tioanime.com"
     },
     "TmdbProvider": {
+         "language": "en",
         "name": "Tmdb",
         "status": 1,
         "url": ""
@@ -558,6 +550,7 @@
         "url": "https://wcostream.cc"
     },
     "YesMoviesProvider": {
+         "language": "en",
         "name": "YesMovies",
         "status": 1,
         "url": "https://yesmovies.mn"
