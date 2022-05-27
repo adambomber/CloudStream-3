@@ -141,6 +141,9 @@ object APIHolder {
             FmoviesAPPProvider(),
             PelisplusSOProvider(),
             YesMoviesProvider(),
+            HDTodayProvider(),
+            MoviesJoyProvider(),
+            MyflixerToProvider(),
         )
     }
 
