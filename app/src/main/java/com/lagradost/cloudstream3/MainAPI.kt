@@ -13,7 +13,6 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.lagradost.cloudstream3.animeproviders.*
 import com.lagradost.cloudstream3.metaproviders.CrossTmdbProvider
 import com.lagradost.cloudstream3.movieproviders.*
-import com.lagradost.cloudstream3.providersnsfw.*
 import com.lagradost.cloudstream3.mvvm.logError
 import com.lagradost.cloudstream3.syncproviders.OAuth2API.Companion.aniListApi
 import com.lagradost.cloudstream3.syncproviders.OAuth2API.Companion.malApi
@@ -145,27 +144,6 @@ object APIHolder {
             HDTodayProvider(),
             MoviesJoyProvider(),
             MyflixerToProvider(),
-
-            // All of NSFW sources
-            Javhdicu(),
-            JavSubCo(),
-            OpJavCom(),
-            Vlxx(),
-            Xvideos(),
-            Pornhub(),
-            HentaiLa(),
-            JKHentai(),
-            Hanime(),
-            HahoMoe(),
-            Pandamovie(),
-
-            // No stream links fetched
-            JavTubeWatch(),
-            JavFreeSh(),
-            JavGuru(),
-            HpJavTv(),
-            JavMost(),
-            Javclcom()
         )
     }
 
@@ -329,7 +307,7 @@ object APIHolder {
     fun Context.filterProviderByPreferredMedia(hasHomePageIsRequired: Boolean = true): List<MainAPI> {
         val settingsManager = PreferenceManager.getDefaultSharedPreferences(this)
         val currentPrefMedia =
-            settingsManager.getInt(this.getString(R.string.prefer_media_type_key), 1)
+            settingsManager.getInt(this.getString(R.string.prefer_media_type_key), 0)
         val langs = this.getApiProviderLangSettings()
         val allApis = apis.filter { langs.contains(it.lang) }
             .filter { api -> api.hasMainPage || !hasHomePageIsRequired }
@@ -341,16 +319,10 @@ object APIHolder {
             val listEnumMovieTv =
                 listOf(TvType.Movie, TvType.TvSeries, TvType.Cartoon, TvType.AsianDrama)
             val listEnumDoc = listOf(TvType.Documentary)
-            val listEnumAnimeMovieTv = listOf(TvType.Movie, TvType.TvSeries, TvType.Cartoon, TvType.AsianDrama, TvType.Anime, TvType.AnimeMovie, TvType.OVA, TvType.Donghua, TvType.Mirror)
-            val listEnumAnimeMovieTvNsfw = listOf(TvType.Movie, TvType.TvSeries, TvType.Cartoon, TvType.AsianDrama, TvType.Anime, TvType.AnimeMovie, TvType.OVA, TvType.Donghua, TvType.Mirror, TvType.JAV, TvType.Hentai, TvType.XXX)
-            val listEnumNSFW = listOf(TvType.JAV, TvType.Hentai, TvType.XXX)
             val mediaTypeList = when (currentPrefMedia) {
                 2 -> listEnumAnime
-                3 -> listEnumMovieTv
-                4 -> listEnumDoc
-                5 -> listEnumAnimeMovieTvNsfw
-                6 -> listEnumNSFW
-                else -> listEnumAnimeMovieTv
+                3 -> listEnumDoc
+                else -> listEnumMovieTv
             }
             allApis.filter { api -> api.supportedTypes.any { it in mediaTypeList } }
         }
@@ -615,9 +587,6 @@ enum class TvType {
     Mirror,
     Donghua,
     AsianDrama,
-    JAV,
-    Hentai,
-    XXX
 }
 
 // IN CASE OF FUTURE ANIME MOVIE OR SMTH
