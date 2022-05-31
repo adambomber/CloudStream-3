@@ -1,4 +1,4 @@
-package com.lagradost.cloudstream3.movieproviders
+package com.lagradost.cloudstream3.animeproviders
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.lagradost.cloudstream3.*
