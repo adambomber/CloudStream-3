@@ -61,6 +61,7 @@ enum class Qualities(var value: Int) {
                 0 -> "Auto"
                 Unknown.value -> ""
                 P2160.value -> "4K"
+                null -> ""
                 else -> "${qual}p"
             }
         }
@@ -118,6 +119,8 @@ val extractorApis: Array<ExtractorApi> = arrayOf(
     MwvnVizcloudInfo(),
     VizcloudDigital(),
     VizcloudCloud(),
+    VideoVard(),
+    VideovardSX(),
     Mp4Upload(),
     StreamTape(),
 
@@ -195,10 +198,6 @@ val extractorApis: Array<ExtractorApi> = arrayOf(
     //  SBPlay1(),
     //  SBPlay2(),
 
-    //Nsfw extractors
-    StreamLare(),
-    PlayLtXyz(),
-    JKhentaiExtractor(),
     PlayerVoxzer(),
 
     BullStream(),
