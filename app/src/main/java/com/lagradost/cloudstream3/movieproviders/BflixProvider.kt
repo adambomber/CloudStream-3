@@ -354,8 +354,7 @@ open class BflixProvider : MainAPI() {
                     jsonservers.vidstream,
                     jsonservers.mcloud,
                     jsonservers.mp4upload,
-                    jsonservers.streamtape,
-                    jsonservers.videovard,
+                    jsonservers.streamtape
                 ).mapNotNull {
                     val epserver = app.get("$mainUrl/ajax/episode/info?id=$it").text
                     (if (epserver.contains("url")) {
