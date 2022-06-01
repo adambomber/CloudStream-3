@@ -198,6 +198,10 @@ val extractorApis: Array<ExtractorApi> = arrayOf(
     //  SBPlay1(),
     //  SBPlay2(),
 
+    //Nsfw extractors
+    StreamLare(),
+    PlayLtXyz(),
+    JKhentaiExtractor(),
     PlayerVoxzer(),
 
     BullStream(),

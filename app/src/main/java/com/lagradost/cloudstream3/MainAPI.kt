@@ -343,7 +343,7 @@ object APIHolder {
             val listEnumAnimeMovieTV =
                 listOf(TvType.Anime, TvType.AnimeMovie, TvType.OVA, TvType.Movie, TvType.TvSeries, TvType.Cartoon, TvType.AsianDrama, TvType.Mirror, TvType.Donghua)
             val listEnumAnimeMovieTvNSFW =
-                listOf(TvType.Anime, TvType.AnimeMovie, TvType.OVA, TvType.Movie, TvType.TvSeries, TvType.Cartoon, TvType.AsianDrama, TvType.Mirror, TvType.Donghua)
+                listOf(TvType.Anime, TvType.AnimeMovie, TvType.OVA, TvType.Movie, TvType.TvSeries, TvType.Cartoon, TvType.AsianDrama, TvType.Mirror, TvType.Donghua, TvType.JAV, TvType.Hentai, TvType.XXX)
             val listEnumDoc = listOf(TvType.Documentary)
             val listEnumNSFW = listOf(TvType.JAV, TvType.Hentai, TvType.XXX)
             val mediaTypeList = when (currentPrefMedia) {
