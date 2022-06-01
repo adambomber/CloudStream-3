@@ -347,11 +347,11 @@ object APIHolder {
             val listEnumDoc = listOf(TvType.Documentary)
             val listEnumNSFW = listOf(TvType.JAV, TvType.Hentai, TvType.XXX)
             val mediaTypeList = when (currentPrefMedia) {
-                1 -> listEnumAnimeMovieTvNSFW
-                2 -> listEnumMovieTv
-                3 -> listEnumAnime
-                4 -> listEnumDoc
-                5 -> listEnumNSFW
+                2 -> listEnumAnimeMovieTvNSFW
+                3 -> listEnumMovieTv
+                4 -> listEnumAnime
+                5 -> listEnumDoc
+                6 -> listEnumNSFW
                 else -> listEnumAnimeMovieTV
             }
             allApis.filter { api -> api.supportedTypes.any { it in mediaTypeList } }
