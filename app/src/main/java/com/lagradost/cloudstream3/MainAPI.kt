@@ -329,7 +329,7 @@ object APIHolder {
     fun Context.filterProviderByPreferredMedia(hasHomePageIsRequired: Boolean = true): List<MainAPI> {
         val settingsManager = PreferenceManager.getDefaultSharedPreferences(this)
         val currentPrefMedia =
-            settingsManager.getInt(this.getString(R.string.prefer_media_type_key), 1)
+            settingsManager.getInt(this.getString(R.string.prefer_media_type_key), 0)
         val langs = this.getApiProviderLangSettings()
         val allApis = apis.filter { langs.contains(it.lang) }
             .filter { api -> api.hasMainPage || !hasHomePageIsRequired }
@@ -347,11 +347,11 @@ object APIHolder {
             val listEnumDoc = listOf(TvType.Documentary)
             val listEnumNSFW = listOf(TvType.JAV, TvType.Hentai, TvType.XXX)
             val mediaTypeList = when (currentPrefMedia) {
-                2 -> listEnumAnimeMovieTvNSFW
-                3 -> listEnumMovieTv
-                4 -> listEnumAnime
-                5 -> listEnumDoc
-                6 -> listEnumNSFW
+                1 -> listEnumAnimeMovieTvNSFW
+                2 -> listEnumMovieTv
+                3 -> listEnumAnime
+                4 -> listEnumDoc
+                5 -> listEnumNSFW
                 else -> listEnumAnimeMovieTV
             }
             allApis.filter { api -> api.supportedTypes.any { it in mediaTypeList } }

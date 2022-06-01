@@ -38,12 +38,12 @@
         <item>NSFW (JAV, XXX, Hentai)</item>
     </array>
     <array name="media_type_pref_values">
+        <item>0</item>
         <item>1</item>
         <item>2</item>
         <item>3</item>
         <item>4</item>
         <item>5</item>
-        <item>6</item>
     </array>
 
     <array name="limit_title_rez_pref_names">

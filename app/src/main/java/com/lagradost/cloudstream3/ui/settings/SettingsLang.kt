@@ -91,7 +91,7 @@ class SettingsLang : PreferenceFragmentCompat() {
             val prefValues = resources.getIntArray(R.array.media_type_pref_values)
 
             val currentPrefMedia =
-                settingsManager.getInt(getString(R.string.prefer_media_type_key), 1)
+                settingsManager.getInt(getString(R.string.prefer_media_type_key), 0)
 
             activity?.showBottomDialog(
                 prefNames.toList(),
