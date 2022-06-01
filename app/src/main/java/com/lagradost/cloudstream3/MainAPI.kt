@@ -333,7 +333,7 @@ object APIHolder {
         val langs = this.getApiProviderLangSettings()
         val allApis = apis.filter { langs.contains(it.lang) }
             .filter { api -> api.hasMainPage || !hasHomePageIsRequired }
-        return if (currentPrefMedia < 1) {
+        return if (currentPrefMedia < 0) {
             allApis
         } else {
             // Filter API depending on preferred media type
