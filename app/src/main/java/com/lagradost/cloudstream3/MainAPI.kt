@@ -347,7 +347,6 @@ object APIHolder {
             val listEnumDoc = listOf(TvType.Documentary)
             val listEnumNSFW = listOf(TvType.JAV, TvType.Hentai, TvType.XXX)
             val mediaTypeList = when (currentPrefMedia) {
-                0 -> listEnumAnimeMovieTV
                 1 -> listEnumAnimeMovieTvNSFW
                 2 -> listEnumMovieTv
                 3 -> listEnumAnime
