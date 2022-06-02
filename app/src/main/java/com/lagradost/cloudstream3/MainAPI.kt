@@ -76,7 +76,7 @@ object APIHolder {
             TwoEmbedProvider(),
             DramaSeeProvider(),
             WatchAsianProvider(),
-	        DramaidProvider(),
+            DramaidProvider(),
             KdramaHoodProvider(),
             AkwamProvider(),
             MyCimaProvider(),
@@ -87,6 +87,8 @@ object APIHolder {
             TheFlixToProvider(),
             StreamingcommunityProvider(),
             TantifilmProvider(),
+            CineblogProvider(),
+            AltadefinizioneProvider(),
             HDMovie5(),
             RebahinProvider(),
             LayarKacaProvider(),
@@ -114,37 +116,23 @@ object APIHolder {
             DubbedAnimeProvider(),
             MonoschinosProvider(),
             KawaiifuProvider(), // disabled due to cloudflare
-	        NeonimeProvider(),
+            NeonimeProvider(),
             KuramanimeProvider(),
             OploverzProvider(),
             GomunimeProvider(),
             NontonAnimeIDProvider(),
             KuronimeProvider(),
             //MultiAnimeProvider(),
-	        NginxProvider(),
+            NginxProvider(),
             OlgplyProvider(),
-
-            // Additional anime providers
-            AnimefenixProvider(),
-            AnimeflvIOProvider(),
-            AnimeIDProvider(),
-            AnimeonlineProvider(),
-            JKAnimeProvider(),
-            KrunchyProvider(),
-            MundoDonghuaProvider(),
-            TioAnimeProvider(),
-
-            // Additional movie providers
-            ComamosRamenProvider(),
-            ElifilmsProvider(),
-            EstrenosDoramasProvider(),
-            FmoviesAPPProvider(),
-            PelisplusSOProvider(),
-            YesMoviesProvider(),
-            HDTodayProvider(),
-            MoviesJoyProvider(),
-            MyflixerToProvider(),
         )
+    }
+
+    fun initAll() {
+        for (api in allProviders) {
+            api.init()
+        }
+        apiMap = null
     }
 
     var apis: List<MainAPI> = arrayListOf()
@@ -162,7 +150,6 @@ object APIHolder {
     fun getApiFromNameNull(apiName: String?): MainAPI? {
         if (apiName == null) return null
         initMap()
-
         return apiMap?.get(apiName)?.let { apis.getOrNull(it) }
     }
 
@@ -175,12 +162,12 @@ object APIHolder {
         return null
     }
 
-    fun getLoadResponseIdFromUrl(url : String, apiName: String) : Int {
+    fun getLoadResponseIdFromUrl(url: String, apiName: String): Int {
         return url.replace(getApiFromName(apiName).mainUrl, "").replace("/", "").hashCode()
     }
 
     fun LoadResponse.getId(): Int {
-        return getLoadResponseIdFromUrl(url,apiName)
+        return getLoadResponseIdFromUrl(url, apiName)
     }
 
     /**
@@ -357,16 +344,16 @@ abstract class MainAPI {
         var overrideData: HashMap<String, ProvidersInfoJson>? = null
     }
 
-    fun overrideWithNewData(data: ProvidersInfoJson) {
-        this.name = data.name
-        this.mainUrl = data.url
-	    this.storedCredentials = data.credentials
-    }
-
-    init {
+    fun init() {
         overrideData?.get(this.javaClass.simpleName)?.let { data ->
             overrideWithNewData(data)
         }
+    }
+
+    fun overrideWithNewData(data: ProvidersInfoJson) {
+        this.name = data.name
+        this.mainUrl = data.url
+        this.storedCredentials = data.credentials
     }
 
     open var name = "NONE"
@@ -569,10 +556,8 @@ enum class ShowStatus {
 }
 
 enum class DubStatus(val id: Int) {
+    Dubbed(1),
     Subbed(0),
-    PremiumSub(1),
-    Dubbed(2),
-    PremiumDub(3),
 }
 
 enum class TvType {
@@ -584,8 +569,6 @@ enum class TvType {
     OVA,
     Torrent,
     Documentary,
-    Mirror,
-    Donghua,
     AsianDrama,
 }
 
@@ -596,7 +579,7 @@ fun TvType.isMovieType(): Boolean {
 
 // returns if the type has an anime opening
 fun TvType.isAnimeOp(): Boolean {
-    return this == TvType.Anime || this == TvType.OVA || this == TvType.Donghua
+    return this == TvType.Anime || this == TvType.OVA
 }
 
 data class SubtitleFile(val lang: String, val url: String)
@@ -788,12 +771,12 @@ fun AnimeSearchResponse.addDubStatus(isDub: Boolean, episodes: Int? = null) {
 }
 
 fun AnimeSearchResponse.addDub(episodes: Int?) {
-    if(episodes == null || episodes <= 0) return
+    if (episodes == null || episodes <= 0) return
     addDubStatus(DubStatus.Dubbed, episodes)
 }
 
 fun AnimeSearchResponse.addSub(episodes: Int?) {
-    if(episodes == null || episodes <= 0) return
+    if (episodes == null || episodes <= 0) return
     addDubStatus(DubStatus.Subbed, episodes)
 }
 

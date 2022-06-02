@@ -304,8 +304,6 @@ class ResultFragment : Fragment(), PanelsChildGestureRegionObserver.GestureRegio
                 TvType.Cartoon -> "Cartoons/$sanitizedFileName"
                 TvType.Torrent -> "Torrent"
                 TvType.Documentary -> "Documentaries"
-                TvType.Mirror -> "Mirror"
-                TvType.Donghua -> "Donghua"
                 TvType.AsianDrama -> "AsianDrama"
             }
         }
@@ -1510,7 +1508,7 @@ class ResultFragment : Fragment(), PanelsChildGestureRegionObserver.GestureRegio
             when (startAction) {
                 START_ACTION_RESUME_LATEST -> {
                     for (ep in episodeList) {
-                        println("WATCH STATUS::: S${ep.season} E ${ep.episode} - ${ep.getWatchProgress()}")
+                        //println("WATCH STATUS::: S${ep.season} E ${ep.episode} - ${ep.getWatchProgress()}")
                         if (ep.getWatchProgress() > 0.90f) { // watched too much
                             continue
                         }
@@ -1530,7 +1528,7 @@ class ResultFragment : Fragment(), PanelsChildGestureRegionObserver.GestureRegio
                         var found = false
                         for (ep in episodeList) {
                             if (ep.id == startValue) { // watched too much
-                                println("WATCH STATUS::: START_ACTION_LOAD_EP S${ep.season} E ${ep.episode} - ${ep.getWatchProgress()}")
+                                //println("WATCH STATUS::: START_ACTION_LOAD_EP S${ep.season} E ${ep.episode} - ${ep.getWatchProgress()}")
                                 handleAction(EpisodeClickEvent(ACTION_PLAY_EPISODE_IN_PLAYER, ep))
                                 found = true
                                 break
@@ -1539,7 +1537,7 @@ class ResultFragment : Fragment(), PanelsChildGestureRegionObserver.GestureRegio
                         if (!found)
                             for (ep in episodeList) {
                                 if (ep.episode == resumeEpisode && ep.season == resumeSeason) {
-                                    println("WATCH STATUS::: START_ACTION_LOAD_EP S${ep.season} E ${ep.episode} - ${ep.getWatchProgress()}")
+                                    //println("WATCH STATUS::: START_ACTION_LOAD_EP S${ep.season} E ${ep.episode} - ${ep.getWatchProgress()}")
                                     handleAction(
                                         EpisodeClickEvent(
                                             ACTION_PLAY_EPISODE_IN_PLAYER,
@@ -1583,12 +1581,7 @@ class ResultFragment : Fragment(), PanelsChildGestureRegionObserver.GestureRegio
         }
 
         observe(viewModel.dubStatus) { status ->
-            val dubstatusName = if (status.name == "Subbed") getString(R.string.dub_status_subbed)
-            else if (status.name == "Dubbed") getString(R.string.dub_status_dubbed)
-            else if (status.name == "PremiumDub") getString(R.string.dub_status_premium)
-            else if (status.name == "PremiumSub") getString(R.string.sub_status_premium)
-            else ""
-            result_dub_select?.text = dubstatusName
+            result_dub_select?.text = status.toString()
         }
 
 //        val preferDub = context?.getApiDubstatusSettings()?.all { it == DubStatus.Dubbed } == true
@@ -1620,14 +1613,9 @@ class ResultFragment : Fragment(), PanelsChildGestureRegionObserver.GestureRegio
             if (ranges != null) {
                 it.popupMenuNoIconsAndNoStringRes(ranges
                     .map { status ->
-                        val dubstatusName = if (status.name == "Subbed") getString(R.string.dub_status_subbed)
-                        else if (status.name == "Dubbed") getString(R.string.dub_status_dubbed)
-                        else if (status.name == "PremiumDub") getString(R.string.dub_status_premium)
-                        else if (status.name == "PremiumSub") getString(R.string.sub_status_premium)
-                        else ""
                         Pair(
                             status.ordinal,
-                            dubstatusName
+                            status.toString()
                         )
                     }
                     .toList()) {
@@ -2008,8 +1996,6 @@ class ResultFragment : Fragment(), PanelsChildGestureRegionObserver.GestureRegio
                             TvType.Documentary -> R.string.documentaries_singular
                             TvType.Movie -> R.string.movies_singular
                             TvType.Torrent -> R.string.torrent_singular
-                            TvType.Mirror -> R.string.mirror_singular
-                            TvType.Donghua -> R.string.donghua_singular
                             TvType.AsianDrama -> R.string.asian_drama_singular
                         }
                     )?.let {
