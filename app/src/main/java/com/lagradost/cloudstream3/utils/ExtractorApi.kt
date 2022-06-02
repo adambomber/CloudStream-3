@@ -149,6 +149,8 @@ val extractorApis: Array<ExtractorApi> = arrayOf(
 
     FEmbed(),
     FeHD(),
+    Femax20(),
+    Suzihaza(),
     Fplayer(),
     DBfilm(),
     LayarKaca(),
