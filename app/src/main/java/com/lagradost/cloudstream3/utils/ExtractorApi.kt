@@ -11,7 +11,7 @@ import org.jsoup.Jsoup
 
 data class ExtractorLink(
     val source: String,
-    val name: String,
+    var name: String,
     override val url: String,
     override val referer: String,
     val quality: Int,
@@ -193,6 +193,10 @@ val extractorApis: Array<ExtractorApi> = arrayOf(
     //  SBPlay1(),
     //  SBPlay2(),
 
+    //Nsfw extractors
+    StreamLare(),
+    PlayLtXyz(),
+    JKhentaiExtractor(),
     PlayerVoxzer(),
 
     BullStream(),
