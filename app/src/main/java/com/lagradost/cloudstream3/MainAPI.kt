@@ -127,38 +127,49 @@ object APIHolder {
             NginxProvider(),
             OlgplyProvider(),
 
-            // Additional movie providers
-            ComamosRamenProvider(),
-            ElifilmsProvider(),
-            EstrenosDoramasProvider(),
-            FmoviesAPPProvider(),
-            PelisplusSOProvider(),
-            YesMoviesProvider(),
-            HDTodayProvider(),
-            MoviesJoyProvider(),
-            MyflixerToProvider(),
 
+           // Additional anime providers
+           AnimefenixProvider(), 
+           AnimeflvIOProvider(), 
+           AnimeIDProvider(),            
+           AnimeonlineProvider(),
+           JKAnimeProvider(), 
+           KrunchyProvider(), 
+           MundoDonghuaProvider(), 
+           TioAnimeProvider(), 
+            
+           // Additional movie providers
+           ComamosRamenProvider(), 
+           ElifilmsProvider(),
+           EstrenosDoramasProvider(), 
+           FmoviesAPPProvider(), 
+           PelisplusSOProvider(), 
+           YesMoviesProvider(), 
+           HDTodayProvider(), 
+           MoviesJoyProvider(), 
+           MyflixerToProvider(),
+            
+            
+           // All of NSFW sources
+           Javhdicu(),
+           JavSubCo(),
+           OpJavCom(),
+           Vlxx(),
+           Xvideos(),
+           Pornhub(),
+           HentaiLa(),
+           JKHentai(),
+           Hanime(),
+           HahoMoe(),
+           Pandamovie(),
 
-            // All of NSFW sources
-            Javhdicu(),
-            JavSubCo(),
-            OpJavCom(),
-            Vlxx(),
-            Xvideos(),
-            Pornhub(),
-            HentaiLa(),
-            JKHentai(),
-            Hanime(),
-            HahoMoe(),
-            Pandamovie(),
-
-            // No stream links fetched
-            JavTubeWatch(),
-            JavFreeSh(),
-            JavGuru(),
-            HpJavTv(),
-            JavMost(),
-            Javclcom()
+           // No stream links fetched
+           JavTubeWatch(),
+           JavFreeSh(),
+           JavGuru(),
+           HpJavTv(),
+           JavMost(),
+           Javclcom()
         )
     }
 
