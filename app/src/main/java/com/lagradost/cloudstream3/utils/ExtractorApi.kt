@@ -183,6 +183,7 @@ val extractorApis: Array<ExtractorApi> = arrayOf(
     DoodSoExtractor(),
     DoodLaExtractor(),
     DoodWsExtractor(),
+    DoodShExtractor(),
 
     AsianLoad(),
 
@@ -192,6 +193,11 @@ val extractorApis: Array<ExtractorApi> = arrayOf(
     ZplayerV2(),
     Upstream(),
 
+    Maxstream(),
+    Tantifilm(),
+    Userload(),
+    Supervideo(),
+    GuardareStream(),
 
     // StreamSB.kt works
     //  SBPlay(),
