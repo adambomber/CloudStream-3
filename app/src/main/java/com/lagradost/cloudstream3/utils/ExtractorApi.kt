@@ -128,6 +128,7 @@ val extractorApis: Array<ExtractorApi> = arrayOf(
     MixDropBz(),
     MixDropCh(),
     MixDrop(),
+    MixDropTo(),
 
     Mcloud(),
     XStreamCdn(),
@@ -146,6 +147,14 @@ val extractorApis: Array<ExtractorApi> = arrayOf(
     SBfull(),
     // Streamhub(), cause Streamhub2() works
     Streamhub2(),
+
+    YourUpload(),
+
+    Videobin(),
+    Videobin1(),
+
+    Sendvid(),
+    Sendvid1(),
 
     FEmbed(),
     FeHD(),
