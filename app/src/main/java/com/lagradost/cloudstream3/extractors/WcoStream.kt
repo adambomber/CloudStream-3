@@ -114,8 +114,8 @@ open class WcoStream : ExtractorApi() {
         val (Id) = (Regex("/e/(.*?)?domain").find(url)?.destructured ?: Regex("""/e/(.*)""").find(
             url
         )?.destructured) ?: return emptyList()
-        //  val (skey) = Regex("""skey\s=\s['"](.*?)['"];""").find(html)?.destructured
-        //     ?: return emptyList()
+      //  val (skey) = Regex("""skey\s=\s['"](.*?)['"];""").find(html)?.destructured
+      //     ?: return emptyList()
         val keys = getNewWcoKey()
         keytwo = keys?.encryptKey ?: return emptyList()
         val encryptedID = encrypt(cipher(keys.cipherkey!!, encrypt(Id))).replace("/", "_").replace("=","")
