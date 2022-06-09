@@ -16,7 +16,13 @@ https://github.com/LagradOst/CloudStream-3/releases
 + No tracking/analytics
 + Bookmarks
 + Download and stream movies, tv-shows and anime
-+ Chromecast
++ Chromecast support
+
+**Crunchyroll Credit:**
+I'm using the Crunchyroll and other providers from Stormunblessed's Cs3 fork. If they stop working please download his fork here https://github.com/Stormunblessed/CloudStream-3
+
+**NSFW Credit:**
+I'm using the NSFW providers from JaceKun's Cs3 fork. If they stop working please download his fork here https://github.com/Jacekun/CloudStream-3XXX
 
 ***Screenshots:***
 (All the images are blurred because of DMCA reasons, but are actually not blurred in the app)
