@@ -243,11 +243,6 @@
         <item name="android:colorAccent">@color/colorPrimaryOrange</item>
     </style>
 
-    <style name="customRatingBar" parent="@style/Widget.AppCompat.RatingBar">
-
-        <item name="android:progressDrawable">@drawable/abc_ratingbar_indicator_material</item>
-        <item name="android:indeterminateDrawable">@drawable/abc_ratingbar_indicator_material</item>
-    </style>
 
     <style name="LoadedStyle">
         <item name="android:navigationBarColor">?attr/primaryGrayBackground</item>

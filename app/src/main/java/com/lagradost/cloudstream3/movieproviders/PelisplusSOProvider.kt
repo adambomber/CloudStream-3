@@ -4,6 +4,7 @@ package com.lagradost.cloudstream3.movieproviders
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.M3u8Helper
+import com.lagradost.cloudstream3.utils.M3u8Helper.Companion.generateM3u8
 import com.lagradost.cloudstream3.utils.extractorApis
 import com.lagradost.cloudstream3.utils.getQualityFromName
 import org.jsoup.Jsoup
@@ -188,25 +189,23 @@ class PelisplusSOProvider:MainAPI() {
         val soup = app.get(link).text
         val m3u8regex = Regex("((https:|http:)\\/\\/.*m3u8.*expiry=(\\d+))")
         val m3u8 = m3u8regex.find(soup)?.value ?: return false
-        M3u8Helper().m3u8Generation(
-            M3u8Helper.M3u8Stream(
-                m3u8,
-                headers = mapOf("Referer" to mainUrl)
-            ), true
-        )
-            .map { stream ->
-                val qualityString = if ((stream.quality ?: 0) == 0) "" else "${stream.quality}p"
-                callback(
-                    ExtractorLink(
-                        name,
-                        "$name $qualityString",
-                        stream.streamUrl,
-                        mainUrl,
-                        getQualityFromName(stream.quality.toString()),
-                        true
-                    )
+
+        generateM3u8(
+            name,
+            m3u8,
+            mainUrl,
+        ).apmap {
+            callback(
+                ExtractorLink(
+                    name,
+                    name,
+                    it.url,
+                    mainUrl,
+                    getQualityFromName(it.quality.toString()),
+                    true
                 )
-            }
+            )
+        }
         return true
     }
 

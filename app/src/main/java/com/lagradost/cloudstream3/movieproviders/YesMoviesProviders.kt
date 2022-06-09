@@ -191,9 +191,9 @@ open class YesMoviesProvider : MainAPI() {
                     app.get("$mainUrl/ajax/v2/season/episodes/$seasonId").document
                         .select(".nav-item a")
                         .apmap {
-                            //    val episodeImg = null
+                        //    val episodeImg = null
                             val episodeTitle = it.attr("title") ?: return@apmap
-                            //   val episodePosterUrl = null
+                         //   val episodePosterUrl = null
                             val episodeData = it.attr("data-id") ?: return@apmap
 
                             episode++
@@ -670,3 +670,4 @@ open class YesMoviesProvider : MainAPI() {
         }
     }
 }
+

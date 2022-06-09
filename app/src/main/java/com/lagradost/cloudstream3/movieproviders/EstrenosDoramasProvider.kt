@@ -38,10 +38,10 @@ class EstrenosDoramasProvider : MainAPI() {
 
        urls.apmap { (url, name) ->
            val home = app.get(url, timeout = 120).document.select("div.clearfix").map {
-               val title = it.selectFirst("h3 a")?.text()?.replace(Regex("[Pp]elicula|[Pp]elicula "),"")
+               val title = cleanTitle(it.selectFirst("h3 a")?.text()!!)
                val poster = it.selectFirst("img.cate_thumb")?.attr("src")
                AnimeSearchResponse(
-                   title!!,
+                   title,
                    it.selectFirst("a")?.attr("href")!!,
                    this.name,
                    TvType.AsianDrama,
@@ -63,12 +63,12 @@ class EstrenosDoramasProvider : MainAPI() {
         val searchob = ArrayList<AnimeSearchResponse>()
         val search =
             app.get("$mainUrl/?s=$query", timeout = 120).document.select("div.clearfix").map {
-                val title = it.selectFirst("h3 a")?.text()?.replace(Regex("[Pp]elicula |[Pp]elicula"),"")
+                val title = cleanTitle(it.selectFirst("h3 a")?.text()!!)
                 val href = it.selectFirst("a")?.attr("href")
                 val image = it.selectFirst("img.cate_thumb")?.attr("src")
                 val lists =
                     AnimeSearchResponse(
-                    title!!,
+                    title,
                     href!!,
                     this.name,
                     TvType.AsianDrama,
@@ -93,32 +93,20 @@ class EstrenosDoramasProvider : MainAPI() {
         val poster = doc.selectFirst("head meta[property]")?.attr("content")
         val title = doc.selectFirst("h1.titulo")?.text()
         val description = try {
-            doc.selectFirst("div.post div.highlight div.font").toString()
+            doc.selectFirst("div.post div.highlight div.font")?.text()
         } catch (e:Exception){
             null
         }
-        val desc = Regex("(<b>Sinopsis: <\\/b><\\/span>.+.\\n.*\\n.*|<b>Sinopsis:<\\/b><\\/span>.+)")
-        val finaldesc = description?.let {
-            desc.findAll(it).map {
-                it.value.replace("<br>","").replace("<b>Sinopsis: </b></span>","")
-                    .replace("<p>","").replace("<b>","").replace("</b>","")
-                    .replace("</span>","").replace("Sinopsis:","")
-            }.toList().first()
-        }
+        val finaldesc = description?.substringAfter("Sinopsis")?.replace(": ", "")?.trim()
         val epi = ArrayList<Episode>()
         val episodes = doc.select("div.post .lcp_catlist a").map {
             val name = it.selectFirst("a")?.text()
             val link = it.selectFirst("a")?.attr("href")
             val test = Episode(link!!, name)
-            if (link.equals(url)) {
-                //nothing
-            }
-            else {
+            if (!link.equals(url)) {
                 epi.add(test)
             }
         }.reversed()
-
-
         return when (val type = if (episodes.isEmpty()) TvType.Movie else TvType.AsianDrama) {
             TvType.AsianDrama -> {
                 return newAnimeLoadResponse(title!!, url, type) {
@@ -131,7 +119,7 @@ class EstrenosDoramasProvider : MainAPI() {
             }
             TvType.Movie -> {
                 MovieLoadResponse(
-                    title?.replace(Regex("[Pp]elicula |[Pp]elicula"),"")!!,
+                    cleanTitle(title!!),
                     url,
                     this.name,
                     TvType.Movie,
@@ -145,6 +133,7 @@ class EstrenosDoramasProvider : MainAPI() {
             }
             else -> null
         }
+
     }
 
 
@@ -154,6 +143,29 @@ class EstrenosDoramasProvider : MainAPI() {
         @JsonProperty("time") val time: Int
     )
 
+    private fun cleanTitle(title: String): String = title.replace(Regex("[Pp]elicula |[Pp]elicula"),"")
+
+    private fun cleanExtractor(
+        source: String,
+        name: String,
+        url: String,
+        referer: String,
+        m3u8: Boolean,
+        callback: (ExtractorLink) -> Unit
+    ): Boolean {
+        callback(
+            ExtractorLink(
+                source,
+                name,
+                url,
+                referer,
+                Qualities.Unknown.value,
+                m3u8
+            )
+        )
+        return true
+    }
+
     override suspend fun loadLinks(
         data: String,
         isCasting: Boolean,
@@ -161,7 +173,7 @@ class EstrenosDoramasProvider : MainAPI() {
         callback: (ExtractorLink) -> Unit
     ): Boolean {
         val headers = mapOf("Host" to "repro3.estrenosdoramas.us",
-            "User-Agent" to "Mozilla/5.0 (Windows NT 10.0; rv:91.0) Gecko/20100101 Firefox/91.0",
+            "User-Agent" to USER_AGENT,
             "Accept" to "*/*",
             "Accept-Language" to "en-US,en;q=0.5",
             "Content-Type" to "application/x-www-form-urlencoded; charset=UTF-8",
@@ -176,7 +188,7 @@ class EstrenosDoramasProvider : MainAPI() {
 
       val document = app.get(data).document
        document.select("div.tab_container iframe").apmap { container ->
-            val directlink = container.attr("src").replace("//ok.ru","https://ok.ru")
+            val directlink = fixUrl(container.attr("src"))
             loadExtractor(directlink, data, callback)
 
            if (directlink.contains("/repro/amz/")) {
@@ -184,7 +196,6 @@ class EstrenosDoramasProvider : MainAPI() {
                amzregex.findAll(directlink).map {
                    it.value.replace(Regex("https:\\/\\/repro3\\.estrenosdoramas\\.us\\/repro\\/amz\\/examples\\/.*\\.php\\?key="),"")
                }.toList().apmap { key ->
-                   println(key)
                    val response = app.post("https://repro3.estrenosdoramas.us/repro/amz/examples/player/api/indexDCA.php",
                    headers = headers,
                        data = mapOf(
@@ -196,14 +207,15 @@ class EstrenosDoramasProvider : MainAPI() {
                    val reprojson = parseJson<ReproDoramas>(response)
                    val decodeurl = base64Decode(reprojson.link)
                    if (decodeurl.contains("m3u8"))
-                       callback(ExtractorLink(
+
+                       cleanExtractor(
                            name,
                            name,
                            decodeurl,
                            "https://repro3.estrenosdoramas.us",
-                           Qualities.Unknown.value,
-                           isM3u8 = decodeurl.contains("m3u8")
-                       ))
+                           decodeurl.contains(".m3u8"),
+                           callback
+                       )
                }
            }
 
@@ -248,21 +260,23 @@ class EstrenosDoramasProvider : MainAPI() {
                            Pair("tk",token)),
                        allowRedirects = false
                    ).text
-                   val extracteklink = link.substringAfter("\"{file:'").substringBefore("',label:")
+                   val extractedlink = link.substringAfter("\"{file:'").substringBefore("',label:")
                        .replace("\\/", "/")
                    val quality = link.substringAfter(",label:'").substringBefore("',type:")
                    val type = link.substringAfter("type: '").substringBefore("'}\"")
-                   if (extracteklink.isNotBlank())
-                       callback(
-                           ExtractorLink(
-                               "Movil",
-                               "Movil $quality",
-                               extracteklink,
-                               "",
-                               Qualities.Unknown.value,
-                               !type.contains("mp4")
-                           )
+                   if (extractedlink.isNotBlank())
+                      if (quality.contains("File not found", ignoreCase = true)) {
+                        //Nothing
+                      } else {
+                       cleanExtractor(
+                           "Movil",
+                           "Movil $quality",
+                           extractedlink,
+                           "",
+                           !type.contains("mp4"),
+                           callback
                        )
+                      }
                }
            }
         }

@@ -175,7 +175,6 @@ class SearchFragment : Fragment() {
                     val pairList =
                         HomeFragment.getPairList(anime, cartoons, tvs, docs, movies, mirror, asian, nsfw)
 
-
                     cancelBtt?.setOnClickListener {
                         dialog.dismissSafe()
                     }

@@ -403,7 +403,7 @@ class HomeFragment : Fragment() {
         context?.let {
             val settingsManager = PreferenceManager.getDefaultSharedPreferences(it)
             toggleRandomButton =
-                settingsManager.getBoolean(getString(R.string.random_button_key), false)
+                settingsManager.getBoolean(getString(R.string.random_button_key), true)
             home_random?.isVisible = toggleRandomButton
             if (!toggleRandomButton) {
                 home_random?.visibility = View.GONE

@@ -23,7 +23,7 @@ data class ExtractorLink(
 
 data class ExtractorUri(
     val uri: Uri,
-    val name: String,
+    var name: String,
 
     val basePath: String? = null,
     val relativePath: String? = null,

@@ -42,16 +42,15 @@ class ElifilmsProvider:MainAPI() {
         if (items.size <= 0) throw ErrorLoadingException()
         return HomePageResponse(items)
     }
-    override suspend fun search(query: String): ArrayList<SearchResponse> {
+    override suspend fun search(query: String): List<SearchResponse> {
         val url = "$mainUrl/?s=$query"
         val doc = app.get(url).document
-        val search = doc.select("article.cf").map {
+        return doc.select("article.cf").map {
             val href = it.selectFirst("div.short_content a")?.attr("href") ?: ""
             val poster = it.selectFirst("a.ah-imagge img")?.attr("data-src")
             val name = it.selectFirst(".short_header")?.text() ?: ""
              (MovieSearchResponse(name, href, this.name, TvType.Movie, poster, null))
         }
-        return ArrayList(search)
     }
     override suspend fun load(url: String): LoadResponse {
         val document = app.get(url, timeout = 120).document

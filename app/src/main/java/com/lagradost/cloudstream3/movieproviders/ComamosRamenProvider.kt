@@ -112,30 +112,26 @@ class ComamosRamenProvider : MainAPI() {
         @JsonProperty("title") var title : String,
     )
 
-    override suspend fun search(query: String): List<SearchResponse> {
-        val url = "${mainUrl.replace("m.","")}/buscar/${query}"
+    override suspend fun search(query: String): List<SearchResponse>? {
+        val url = "${mainUrl.replace("m.", "")}/buscar/${query}"
         val document = app.get(url).document
-        val search = ArrayList<AnimeSearchResponse>()
-         document.select("script[type=application/json]").map { script ->
-            val json = parseJson<SearchOb>(script.data())
-              json.props?.pageProps?.data?.datum?.map {
-                 val title = it.title
-                 val img = "https://img.comamosramen.com/${it.img?.vertical}-high.jpg"
-                 val link = "$mainUrl/v/${it.Id}/${title.replace(" ", "-")}"
-                 search.add(AnimeSearchResponse(
-                     title,
-                     link,
-                     this.name,
-                     TvType.AsianDrama,
-                     img,
-                     null,
-                     if (title.contains("Latino")) EnumSet.of(DubStatus.Dubbed) else EnumSet.of(DubStatus.Subbed),
-                 ))
-             }
+        val script = document.selectFirst("script[type=application/json]")?.data()
+        val json = parseJson<SearchOb>(script.toString())
+        return json.props?.pageProps?.data?.datum?.map {
+            val title = it.title
+            val img = "https://img.comamosramen.com/${it.img?.vertical}-high.jpg"
+            val link = "$mainUrl/v/${it.Id}/${title.replace(" ", "-")}"
+            AnimeSearchResponse(
+                title,
+                link,
+                this.name,
+                TvType.AsianDrama,
+                img,
+                null,
+                if (title.contains("Latino")) EnumSet.of(DubStatus.Dubbed) else EnumSet.of(DubStatus.Subbed),
+            )
         }
-        return search
     }
-
 
     data class LoadMain (
         @JsonProperty("props") var props : LoadProps? = LoadProps(),

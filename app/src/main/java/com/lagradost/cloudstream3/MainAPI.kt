@@ -54,7 +54,6 @@ object APIHolder {
             PelisflixProvider(),
             SeriesflixProvider(),
             IHaveNoTvProvider(), // Documentaries provider
-            LookMovieProvider(), // RECAPTCHA (Please allow up to 5 seconds...)
             VMoveeProvider(),
             AllMoviesForYouProvider(),
             VidEmbedProvider(),
@@ -127,49 +126,42 @@ object APIHolder {
             NginxProvider(),
             OlgplyProvider(),
 
+            // Additional anime providers
+            KrunchyProvider(),
 
-           // Additional anime providers
-           AnimefenixProvider(), 
-           AnimeflvIOProvider(), 
-           AnimeIDProvider(),            
-           AnimeonlineProvider(),
-           JKAnimeProvider(), 
-           KrunchyProvider(), 
-           MundoDonghuaProvider(), 
-           TioAnimeProvider(), 
-            
-           // Additional movie providers
-           ComamosRamenProvider(), 
-           ElifilmsProvider(),
-           EstrenosDoramasProvider(), 
-           FmoviesAPPProvider(), 
-           PelisplusSOProvider(), 
-           YesMoviesProvider(), 
-           HDTodayProvider(), 
-           MoviesJoyProvider(), 
-           MyflixerToProvider(),
-            
-            
-           // All of NSFW sources
-           Javhdicu(),
-           JavSubCo(),
-           OpJavCom(),
-           Vlxx(),
-           Xvideos(),
-           Pornhub(),
-           HentaiLa(),
-           JKHentai(),
-           Hanime(),
-           HahoMoe(),
-           Pandamovie(),
 
-           // No stream links fetched
-           JavTubeWatch(),
-           JavFreeSh(),
-           JavGuru(),
-           HpJavTv(),
-           JavMost(),
-           Javclcom()
+            // Additional movie providers
+            ComamosRamenProvider(),
+            ElifilmsProvider(),
+            EstrenosDoramasProvider(),
+            FmoviesAPPProvider(),
+            PelisplusSOProvider(),
+            YesMoviesProvider(),
+            HDTodayProvider(),
+            MoviesJoyProvider(),
+            MyflixerToProvider(),
+
+
+            // All of NSFW sources
+            Javhdicu(),
+            JavSubCo(),
+            OpJavCom(),
+            Vlxx(),
+            Xvideos(),
+            Pornhub(),
+            HentaiLa(),
+            JKHentai(),
+            Hanime(),
+            HahoMoe(),
+            Pandamovie(),
+
+            // No stream links fetched
+            JavTubeWatch(),
+            JavFreeSh(),
+            JavGuru(),
+            HpJavTv(),
+            JavMost(),
+            Javclcom()
         )
     }
 
@@ -525,12 +517,6 @@ fun base64Encode(array: ByteArray): String {
 
 class ErrorLoadingException(message: String? = null) : Exception(message)
 
-fun parseRating(ratingString: String?): Int? {
-    if (ratingString == null) return null
-    val floatRating = ratingString.toFloatOrNull() ?: return null
-    return (floatRating * 10).toInt()
-}
-
 fun MainAPI.fixUrlNull(url: String?): String? {
     if (url.isNullOrEmpty()) {
         return null
@@ -640,7 +626,7 @@ fun TvType.isMovieType(): Boolean {
 
 // returns if the type has an anime opening
 fun TvType.isAnimeOp(): Boolean {
-    return this == TvType.Anime || this == TvType.OVA
+    return this == TvType.Anime || this == TvType.OVA || this == TvType.Donghua
 }
 
 data class SubtitleFile(val lang: String, val url: String)
@@ -909,7 +895,7 @@ interface LoadResponse {
     var posterUrl: String?
     var year: Int?
     var plot: String?
-    var rating: Int? // 1-1000
+    var rating: Int? // 0-10000
     var tags: List<String>?
     var duration: Int? // in minutes
     var trailers: List<String>?
@@ -988,7 +974,7 @@ interface LoadResponse {
         }
 
         fun LoadResponse.addRating(value: Int?) {
-            if (value ?: return < 0 || value > 1000) {
+            if ((value ?: return) < 0 || value > 10000) {
                 return
             }
             this.rating = value
