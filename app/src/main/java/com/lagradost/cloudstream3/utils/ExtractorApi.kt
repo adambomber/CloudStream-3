@@ -11,7 +11,7 @@ import org.jsoup.Jsoup
 
 data class ExtractorLink(
     val source: String,
-    var name: String,
+    val name: String,
     override val url: String,
     override val referer: String,
     val quality: Int,
@@ -128,7 +128,6 @@ val extractorApis: Array<ExtractorApi> = arrayOf(
     MixDropBz(),
     MixDropCh(),
     MixDrop(),
-    MixDropTo(),
 
     Mcloud(),
     XStreamCdn(),
@@ -148,18 +147,8 @@ val extractorApis: Array<ExtractorApi> = arrayOf(
     // Streamhub(), cause Streamhub2() works
     Streamhub2(),
 
-    YourUpload(),
-
-    Videobin(),
-    Videobin1(),
-
-    Sendvid(),
-    Sendvid1(),
-
     FEmbed(),
     FeHD(),
-    Femax20(),
-    Suzihaza(),
     Fplayer(),
     DBfilm(),
     LayarKaca(),
@@ -204,10 +193,6 @@ val extractorApis: Array<ExtractorApi> = arrayOf(
     //  SBPlay1(),
     //  SBPlay2(),
 
-    //Nsfw extractors
-    StreamLare(),
-    PlayLtXyz(),
-    JKhentaiExtractor(),
     PlayerVoxzer(),
 
     BullStream(),

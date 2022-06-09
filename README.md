@@ -1,14 +1,14 @@
 # CloudStream-3
 
 <!-- ![Maintenance](https://img.shields.io/maintenance/yes/2022?color=blue&style=for-the-badge) -->
-![GitHub release](https://img.shields.io/github/v/release/KillerDogeEmpire/cloudstream-3?sort=semver&style=for-the-badge)
-![Downloads](https://img.shields.io/github/downloads/KillerDogeEmpire/CloudStream-3/total?color=blue&style=for-the-badge)
-![Build](https://img.shields.io/github/workflow/status/KillerDogeEmpire/CloudStream-3/Pre-release?style=for-the-badge)
+![GitHub release](https://img.shields.io/github/v/release/LagradOst/cloudstream-3?sort=semver&style=for-the-badge)
+![Downloads](https://img.shields.io/github/downloads/lagradost/CloudStream-3/total?color=blue&style=for-the-badge)
+![Build](https://img.shields.io/github/workflow/status/lagradost/CloudStream-3/Pre-release?style=for-the-badge)
 [![Discord](https://img.shields.io/discord/737724143126052974?style=for-the-badge)](https://discord.gg/5Hus6fM)
 
 
 **DOWNLOAD:**
-https://github.com/KillerDogeEmpire/CloudStream-3/releases
+https://github.com/LagradOst/CloudStream-3/releases
 
 
 ***Features:***
@@ -16,14 +16,7 @@ https://github.com/KillerDogeEmpire/CloudStream-3/releases
 + No tracking/analytics
 + Bookmarks
 + Download and stream movies, tv-shows and anime
-+ Chromecast support
-
-
-**Crunchyroll Credit:**
- I'm using the Crunchyroll and other providers from Stormunblessed's Cs3 fork. If they stop working please download his fork here https://github.com/Stormunblessed/CloudStream-3
-
-**NSFW Credit:**
-I'm using the NSFW providers from JaceKun's Cs3 fork. If they stop working please download his fork here https://github.com/Jacekun/CloudStream-3XXX
++ Chromecast
 
 ***Screenshots:***
 (All the images are blurred because of DMCA reasons, but are actually not blurred in the app)
@@ -63,9 +56,9 @@ The app is purely for educational and personal use.
 
 CloudStream 3 does not host any content on the app, and has no control over what media is put up or taken down. CloudStream 3 functions like any other search engine, such as Google. CloudStream 3 does not host, upload or manage any videos, films or content. It simply crawls, aggregates and displayes links in a convenient, user-friendly interface.
 
-It merely scrapes 3rd-party websites that are publicly accessible via any regular web browser. It is the responsibility of user to avoid any actions that might violate the laws governing his/her locality. Use CloudStream 3 at your own risk.
+It merely scrapes 3rd-party websites that are publicly accessable via any regular web browser. It is the responsibility of user to avoid any actions that might violate the laws governing his/her locality. Use CloudStream 3 at your own risk.
 
 
 ***Sites used:***
 
-Look [here](https://killerdogeempire.github.io/CloudStream-3/) for a comprehensive list
+Look [here](https://lagradost.github.io/CloudStream-3/) for a comprehensive list

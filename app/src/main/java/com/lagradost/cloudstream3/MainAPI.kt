@@ -13,7 +13,6 @@ import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.lagradost.cloudstream3.animeproviders.*
 import com.lagradost.cloudstream3.metaproviders.CrossTmdbProvider
 import com.lagradost.cloudstream3.movieproviders.*
-import com.lagradost.cloudstream3.providersnsfw.*
 import com.lagradost.cloudstream3.mvvm.logError
 import com.lagradost.cloudstream3.syncproviders.AccountManager.Companion.aniListApi
 import com.lagradost.cloudstream3.syncproviders.AccountManager.Companion.malApi
@@ -54,7 +53,6 @@ object APIHolder {
             PelisflixProvider(),
             SeriesflixProvider(),
             IHaveNoTvProvider(), // Documentaries provider
-            LookMovieProvider(), // RECAPTCHA (Please allow up to 5 seconds...)
             VMoveeProvider(),
             AllMoviesForYouProvider(),
             VidEmbedProvider(),
@@ -126,50 +124,6 @@ object APIHolder {
             //MultiAnimeProvider(),
             NginxProvider(),
             OlgplyProvider(),
-
-
-           // Additional anime providers
-           AnimefenixProvider(), 
-           AnimeflvIOProvider(), 
-           AnimeIDProvider(),            
-           AnimeonlineProvider(),
-           JKAnimeProvider(), 
-           KrunchyProvider(), 
-           MundoDonghuaProvider(), 
-           TioAnimeProvider(), 
-            
-           // Additional movie providers
-           ComamosRamenProvider(), 
-           ElifilmsProvider(),
-           EstrenosDoramasProvider(), 
-           FmoviesAPPProvider(), 
-           PelisplusSOProvider(), 
-           YesMoviesProvider(), 
-           HDTodayProvider(), 
-           MoviesJoyProvider(), 
-           MyflixerToProvider(),
-            
-            
-           // All of NSFW sources
-           Javhdicu(),
-           JavSubCo(),
-           OpJavCom(),
-           Vlxx(),
-           Xvideos(),
-           Pornhub(),
-           HentaiLa(),
-           JKHentai(),
-           Hanime(),
-           HahoMoe(),
-           Pandamovie(),
-
-           // No stream links fetched
-           JavTubeWatch(),
-           JavFreeSh(),
-           JavGuru(),
-           HpJavTv(),
-           JavMost(),
-           Javclcom()
         )
     }
 
@@ -343,26 +297,18 @@ object APIHolder {
         val langs = this.getApiProviderLangSettings()
         val allApis = apis.filter { langs.contains(it.lang) }
             .filter { api -> api.hasMainPage || !hasHomePageIsRequired }
-        return if (currentPrefMedia < 0) {
+        return if (currentPrefMedia < 1) {
             allApis
         } else {
             // Filter API depending on preferred media type
             val listEnumAnime = listOf(TvType.Anime, TvType.AnimeMovie, TvType.OVA)
             val listEnumMovieTv =
                 listOf(TvType.Movie, TvType.TvSeries, TvType.Cartoon, TvType.AsianDrama)
-            val listEnumAnimeMovieTV =
-                listOf(TvType.Anime, TvType.AnimeMovie, TvType.OVA, TvType.Movie, TvType.TvSeries, TvType.Cartoon, TvType.AsianDrama, TvType.Mirror, TvType.Donghua)
-            val listEnumAnimeMovieTvNSFW =
-                listOf(TvType.Anime, TvType.AnimeMovie, TvType.OVA, TvType.Movie, TvType.TvSeries, TvType.Cartoon, TvType.AsianDrama, TvType.Mirror, TvType.Donghua, TvType.JAV, TvType.Hentai, TvType.XXX)
             val listEnumDoc = listOf(TvType.Documentary)
-            val listEnumNSFW = listOf(TvType.JAV, TvType.Hentai, TvType.XXX)
             val mediaTypeList = when (currentPrefMedia) {
-                1 -> listEnumAnimeMovieTvNSFW
-                2 -> listEnumMovieTv
-                3 -> listEnumAnime
-                4 -> listEnumDoc
-                5 -> listEnumNSFW
-                else -> listEnumAnimeMovieTV
+                2 -> listEnumAnime
+                3 -> listEnumDoc
+                else -> listEnumMovieTv
             }
             allApis.filter { api -> api.supportedTypes.any { it in mediaTypeList } }
         }
@@ -525,12 +471,6 @@ fun base64Encode(array: ByteArray): String {
 
 class ErrorLoadingException(message: String? = null) : Exception(message)
 
-fun parseRating(ratingString: String?): Int? {
-    if (ratingString == null) return null
-    val floatRating = ratingString.toFloatOrNull() ?: return null
-    return (floatRating * 10).toInt()
-}
-
 fun MainAPI.fixUrlNull(url: String?): String? {
     if (url.isNullOrEmpty()) {
         return null
@@ -610,10 +550,8 @@ enum class ShowStatus {
 }
 
 enum class DubStatus(val id: Int) {
+    Dubbed(1),
     Subbed(0),
-    PremiumSub(1),
-    Dubbed(2),
-    PremiumDub(3),
 }
 
 enum class TvType {
@@ -625,12 +563,7 @@ enum class TvType {
     OVA,
     Torrent,
     Documentary,
-    Mirror,
-    Donghua,
     AsianDrama,
-    JAV,
-    Hentai,
-    XXX
 }
 
 // IN CASE OF FUTURE ANIME MOVIE OR SMTH
@@ -909,7 +842,7 @@ interface LoadResponse {
     var posterUrl: String?
     var year: Int?
     var plot: String?
-    var rating: Int? // 1-1000
+    var rating: Int? // 0-10000
     var tags: List<String>?
     var duration: Int? // in minutes
     var trailers: List<String>?
@@ -988,7 +921,7 @@ interface LoadResponse {
         }
 
         fun LoadResponse.addRating(value: Int?) {
-            if (value ?: return < 0 || value > 1000) {
+            if ((value ?: return) < 0 || value > 10000) {
                 return
             }
             this.rating = value
