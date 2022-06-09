@@ -19,33 +19,41 @@
             android:icon="@drawable/ic_baseline_warning_24" />
 
     <Preference
-            android:title="@string/github"
-            android:icon="@drawable/ic_github_logo"
-            app:summary="https://github.com/LagradOst/CloudStream-3">
+        android:title="@string/github"
+        android:icon="@drawable/ic_github_logo"
+        app:summary="https://github.com/KillerDogeEmpire/CloudStream-3">
         <intent
-                android:action="android.intent.action.VIEW"
-                android:data="https://github.com/LagradOst/CloudStream-3" />
+            android:action="android.intent.action.VIEW"
+            android:data="https://github.com/KillerDogeEmpire/CloudStream-3" />
+    </Preference>
+    <Preference
+        android:title="App original"
+        android:icon="@drawable/ic_github_logo"
+        app:summary="https://github.com/Lagradost/CloudStream-3">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:data="https://github.com/Lagradost/CloudStream-3" />
     </Preference>
 
     <Preference
-            android:title="@string/lightnovel"
-            android:icon="@drawable/quick_novel_icon"
-            app:summary="https://github.com/LagradOst/QuickNovel">
+        android:title="@string/lightnovel"
+        android:icon="@drawable/quick_novel_icon"
+        app:summary="https://github.com/LagradOst/QuickNovel">
         <intent
-                android:action="android.intent.action.VIEW"
-                android:data="https://github.com/LagradOst/QuickNovel" />
+            android:action="android.intent.action.VIEW"
+            android:data="https://github.com/LagradOst/QuickNovel" />
     </Preference>
     <Preference
-            android:title="@string/discord"
-            android:icon="@drawable/ic_baseline_discord_24"
-            app:summary="https://discord.gg/5Hus6fM">
+        android:title="@string/discord"
+        android:icon="@drawable/ic_baseline_discord_24"
+        app:summary="https://discord.gg/5Hus6fM">
         <intent
-                android:action="android.intent.action.VIEW"
-                android:data="https://discord.gg/5Hus6fM" />
+            android:action="android.intent.action.VIEW"
+            android:data="https://discord.gg/5Hus6fM" />
     </Preference>
     <Preference
-            android:key="@string/benene_count"
-            android:title="@string/benene"
-            android:icon="@drawable/benene"
-            app:summary="@string/benene_des" />
+        android:key="@string/benene_count"
+        android:title="@string/benene"
+        android:icon="@drawable/benene"
+        app:summary="@string/benene_des" />
 </PreferenceScreen>
