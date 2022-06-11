@@ -22,7 +22,7 @@ import com.lagradost.nicehttp.NiceResponse
 
 class HDTodayProviderTV : YesMoviesProvider() {
     override var mainUrl = "https://hdtoday.tv"
-    override var name = "HDToday.TV"
+    override var name = "HDToday"
 }
 
 class MoviesJoyProvider : YesMoviesProvider() {
