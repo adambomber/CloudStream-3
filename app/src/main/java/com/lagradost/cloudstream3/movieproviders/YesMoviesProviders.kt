@@ -20,9 +20,9 @@ import com.lagradost.nicehttp.NiceResponse
 
 
 
-class HDTodayProvider : YesMoviesProvider() {
+class HDTodayProviderTV : YesMoviesProvider() {
     override var mainUrl = "https://hdtoday.tv"
-    override var name = "HDToday"
+    override var name = "HDToday.TV"
 }
 
 class MoviesJoyProvider : YesMoviesProvider() {
