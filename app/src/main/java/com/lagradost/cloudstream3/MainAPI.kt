@@ -92,6 +92,7 @@ object APIHolder {
             HDMovie5(),
             RebahinProvider(),
             LayarKacaProvider(),
+            HDTodayProvider(),
 
             // Metadata providers
             //TmdbProvider(),
