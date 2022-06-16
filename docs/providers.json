@@ -41,6 +41,18 @@
         "status": 1,
         "url": "https://www.animeworld.tv"
     },
+    "AnimefenixProvider": {
+        "language": "es",
+        "name": "Animefenix",
+        "status": 1,
+        "url": "https://animefenix.com"
+    },
+    "AnimeflvIOProvider": {
+        "language": "es",
+        "name": "Animeflv.io",
+        "status": 1,
+        "url": "https://animeflv.io"
+    },
     "AnimeflvnetProvider": {
         "language": "es",
         "name": "Animeflv.net",
@@ -226,6 +238,12 @@
         "status": 1,
         "url": "https://ihavenotv.com"
     },
+    "JKAnimeProvider": {
+        "language": "es",
+        "name": "JKAnime",
+        "status": 1,
+        "url": "https://jkanime.net"
+    },
     "KawaiifuProvider": {
         "language": "en",
         "name": "Kawaiifu",
@@ -283,6 +301,12 @@
         "name": "Monoschinos",
         "status": 1,
         "url": "https://monoschinos2.com"
+    },
+    "MundoDonghuaProvider": {
+        "language": "es",
+        "name": "MundoDonghua",
+        "status": 1,
+        "url": "https://www.mundodonghua.com"
     },
     "MyCimaProvider": {
         "language": "ar",
