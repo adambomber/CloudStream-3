@@ -36,24 +36,24 @@ class EstrenosDoramasProvider : MainAPI() {
 
         val items = ArrayList<HomePageList>()
 
-       urls.apmap { (url, name) ->
-           val home = app.get(url, timeout = 120).document.select("div.clearfix").map {
-               val title = cleanTitle(it.selectFirst("h3 a")?.text()!!)
-               val poster = it.selectFirst("img.cate_thumb")?.attr("src")
-               AnimeSearchResponse(
-                   title,
-                   it.selectFirst("a")?.attr("href")!!,
-                   this.name,
-                   TvType.AsianDrama,
-                   poster,
-                   null,
-                   if (title.contains("Latino") || title.contains("Castellano")) EnumSet.of(
-                       DubStatus.Dubbed
-                   ) else EnumSet.of(DubStatus.Subbed),
-               )
-           }
-           items.add(HomePageList(name, home))
-       }
+        urls.apmap { (url, name) ->
+            val home = app.get(url, timeout = 120).document.select("div.clearfix").map {
+                val title = cleanTitle(it.selectFirst("h3 a")?.text()!!)
+                val poster = it.selectFirst("img.cate_thumb")?.attr("src")
+                AnimeSearchResponse(
+                    title,
+                    it.selectFirst("a")?.attr("href")!!,
+                    this.name,
+                    TvType.AsianDrama,
+                    poster,
+                    null,
+                    if (title.contains("Latino") || title.contains("Castellano")) EnumSet.of(
+                        DubStatus.Dubbed
+                    ) else EnumSet.of(DubStatus.Subbed),
+                )
+            }
+            items.add(HomePageList(name, home))
+        }
 
         if (items.size <= 0) throw ErrorLoadingException()
         return HomePageResponse(items)
@@ -68,16 +68,16 @@ class EstrenosDoramasProvider : MainAPI() {
                 val image = it.selectFirst("img.cate_thumb")?.attr("src")
                 val lists =
                     AnimeSearchResponse(
-                    title,
-                    href!!,
-                    this.name,
-                    TvType.AsianDrama,
-                    image,
-                    null,
-                    if (title.contains("Latino") || title.contains("Castellano")) EnumSet.of(
-                        DubStatus.Dubbed
-                    ) else EnumSet.of(DubStatus.Subbed),
-                )
+                        title,
+                        href!!,
+                        this.name,
+                        TvType.AsianDrama,
+                        image,
+                        null,
+                        if (title.contains("Latino") || title.contains("Castellano")) EnumSet.of(
+                            DubStatus.Dubbed
+                        ) else EnumSet.of(DubStatus.Subbed),
+                    )
                 if (href.contains("capitulo")) {
                     //nothing
                 }
@@ -186,99 +186,99 @@ class EstrenosDoramasProvider : MainAPI() {
             "Sec-Fetch-Site" to "same-origin",
             "Cache-Control" to "max-age=0",)
 
-      val document = app.get(data).document
-       document.select("div.tab_container iframe").apmap { container ->
+        val document = app.get(data).document
+        document.select("div.tab_container iframe").apmap { container ->
             val directlink = fixUrl(container.attr("src"))
             loadExtractor(directlink, data, callback)
 
-           if (directlink.contains("/repro/amz/")) {
-               val amzregex = Regex("https:\\/\\/repro3\\.estrenosdoramas\\.us\\/repro\\/amz\\/examples\\/.*\\.php\\?key=.*\$")
-               amzregex.findAll(directlink).map {
-                   it.value.replace(Regex("https:\\/\\/repro3\\.estrenosdoramas\\.us\\/repro\\/amz\\/examples\\/.*\\.php\\?key="),"")
-               }.toList().apmap { key ->
-                   val response = app.post("https://repro3.estrenosdoramas.us/repro/amz/examples/player/api/indexDCA.php",
-                   headers = headers,
-                       data = mapOf(
-                           Pair("key",key),
-                           Pair("token","MDAwMDAwMDAwMA=="),
-                       ),
-                       allowRedirects = false
-                       ).text
-                   val reprojson = parseJson<ReproDoramas>(response)
-                   val decodeurl = base64Decode(reprojson.link)
-                   if (decodeurl.contains("m3u8"))
+            if (directlink.contains("/repro/amz/")) {
+                val amzregex = Regex("https:\\/\\/repro3\\.estrenosdoramas\\.us\\/repro\\/amz\\/examples\\/.*\\.php\\?key=.*\$")
+                amzregex.findAll(directlink).map {
+                    it.value.replace(Regex("https:\\/\\/repro3\\.estrenosdoramas\\.us\\/repro\\/amz\\/examples\\/.*\\.php\\?key="),"")
+                }.toList().apmap { key ->
+                    val response = app.post("https://repro3.estrenosdoramas.us/repro/amz/examples/player/api/indexDCA.php",
+                        headers = headers,
+                        data = mapOf(
+                            Pair("key",key),
+                            Pair("token","MDAwMDAwMDAwMA=="),
+                        ),
+                        allowRedirects = false
+                    ).text
+                    val reprojson = parseJson<ReproDoramas>(response)
+                    val decodeurl = base64Decode(reprojson.link)
+                    if (decodeurl.contains("m3u8"))
 
-                       cleanExtractor(
-                           name,
-                           name,
-                           decodeurl,
-                           "https://repro3.estrenosdoramas.us",
-                           decodeurl.contains(".m3u8"),
-                           callback
-                       )
-               }
-           }
+                        cleanExtractor(
+                            name,
+                            name,
+                            decodeurl,
+                            "https://repro3.estrenosdoramas.us",
+                            decodeurl.contains(".m3u8"),
+                            callback
+                        )
+                }
+            }
 
 
-           if (directlink.contains("reproducir14")) {
-               val regex = Regex("(https:\\/\\/repro.\\.estrenosdoramas\\.us\\/repro\\/reproducir14\\.php\\?key=[a-zA-Z0-9]{0,8}[a-zA-Z0-9_-]+)")
-               regex.findAll(directlink).map {
-                   it.value
-               }.toList().apmap {
-                   val doc = app.get(it).text
-                   val videoid = doc.substringAfter("vid=\"").substringBefore("\" n")
-                   val token = doc.substringAfter("name=\"").substringBefore("\" s")
-                   val acctkn = doc.substringAfter("{ acc: \"").substringBefore("\", id:")
-                   val link = app.post("https://repro3.estrenosdoramas.us/repro/proto4.php",
-                       headers = headers,
-                       data = mapOf(
-                           Pair("acc",acctkn),
-                           Pair("id",videoid),
-                           Pair("tk",token)),
-                       allowRedirects = false
-                   ).text
-                   val extracteklink = link.substringAfter("\"urlremoto\":\"").substringBefore("\"}")
-                       .replace("\\/", "/").replace("//ok.ru/","http://ok.ru/")
-                   loadExtractor(extracteklink, data, callback)
-               }
-           }
+            if (directlink.contains("reproducir14")) {
+                val regex = Regex("(https:\\/\\/repro.\\.estrenosdoramas\\.us\\/repro\\/reproducir14\\.php\\?key=[a-zA-Z0-9]{0,8}[a-zA-Z0-9_-]+)")
+                regex.findAll(directlink).map {
+                    it.value
+                }.toList().apmap {
+                    val doc = app.get(it).text
+                    val videoid = doc.substringAfter("vid=\"").substringBefore("\" n")
+                    val token = doc.substringAfter("name=\"").substringBefore("\" s")
+                    val acctkn = doc.substringAfter("{ acc: \"").substringBefore("\", id:")
+                    val link = app.post("https://repro3.estrenosdoramas.us/repro/proto4.php",
+                        headers = headers,
+                        data = mapOf(
+                            Pair("acc",acctkn),
+                            Pair("id",videoid),
+                            Pair("tk",token)),
+                        allowRedirects = false
+                    ).text
+                    val extracteklink = link.substringAfter("\"urlremoto\":\"").substringBefore("\"}")
+                        .replace("\\/", "/").replace("//ok.ru/","http://ok.ru/")
+                    loadExtractor(extracteklink, data, callback)
+                }
+            }
 
-           if (directlink.contains("reproducir120")) {
-               val regex = Regex("(https:\\/\\/repro3.estrenosdoramas.us\\/repro\\/reproducir120\\.php\\?\\nkey=[a-zA-Z0-9]{0,8}[a-zA-Z0-9_-]+)")
-               regex.findAll(directlink).map {
-                   it.value
-               }.toList().apmap {
-                   val doc = app.get(it).text
-                   val videoid = doc.substringAfter("var videoid = '").substringBefore("';")
-                   val token = doc.substringAfter("var tokens = '").substringBefore("';")
-                   val acctkn = doc.substringAfter("{ acc: \"").substringBefore("\", id:")
-                   val link = app.post("https://repro3.estrenosdoramas.us/repro/api3.php",
-                       headers = headers,
-                       data = mapOf(
-                           Pair("acc",acctkn),
-                           Pair("id",videoid),
-                           Pair("tk",token)),
-                       allowRedirects = false
-                   ).text
-                   val extractedlink = link.substringAfter("\"{file:'").substringBefore("',label:")
-                       .replace("\\/", "/")
-                   val quality = link.substringAfter(",label:'").substringBefore("',type:")
-                   val type = link.substringAfter("type: '").substringBefore("'}\"")
-                   if (extractedlink.isNotBlank())
-                      if (quality.contains("File not found", ignoreCase = true)) {
-                        //Nothing
-                      } else {
-                       cleanExtractor(
-                           "Movil",
-                           "Movil $quality",
-                           extractedlink,
-                           "",
-                           !type.contains("mp4"),
-                           callback
-                       )
-                      }
-               }
-           }
+            if (directlink.contains("reproducir120")) {
+                val regex = Regex("(https:\\/\\/repro3.estrenosdoramas.us\\/repro\\/reproducir120\\.php\\?\\nkey=[a-zA-Z0-9]{0,8}[a-zA-Z0-9_-]+)")
+                regex.findAll(directlink).map {
+                    it.value
+                }.toList().apmap {
+                    val doc = app.get(it).text
+                    val videoid = doc.substringAfter("var videoid = '").substringBefore("';")
+                    val token = doc.substringAfter("var tokens = '").substringBefore("';")
+                    val acctkn = doc.substringAfter("{ acc: \"").substringBefore("\", id:")
+                    val link = app.post("https://repro3.estrenosdoramas.us/repro/api3.php",
+                        headers = headers,
+                        data = mapOf(
+                            Pair("acc",acctkn),
+                            Pair("id",videoid),
+                            Pair("tk",token)),
+                        allowRedirects = false
+                    ).text
+                    val extractedlink = link.substringAfter("\"{file:'").substringBefore("',label:")
+                        .replace("\\/", "/")
+                    val quality = link.substringAfter(",label:'").substringBefore("',type:")
+                    val type = link.substringAfter("type: '").substringBefore("'}\"")
+                    if (extractedlink.isNotBlank())
+                        if (quality.contains("File not found", ignoreCase = true)) {
+                            //Nothing
+                        } else {
+                            cleanExtractor(
+                                "Movil",
+                                "Movil $quality",
+                                extractedlink,
+                                "",
+                                !type.contains("mp4"),
+                                callback
+                            )
+                        }
+                }
+            }
         }
 
         return true
