@@ -122,6 +122,7 @@ object APIHolder {
             DubbedAnimeProvider(),
             MundoDonghuaProvider(),
             MonoschinosProvider(),
+            MundoDonghuaProvider(),
             KawaiifuProvider(), // disabled due to cloudflare
             NeonimeProvider(),
             KuramanimeProvider(),
