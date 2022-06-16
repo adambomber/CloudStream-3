@@ -43,6 +43,8 @@ object APIHolder {
     val allProviders by lazy {
         arrayListOf(
             // Movie providers
+            ElifilmsProvider(),
+            EstrenosDoramasProvider(),
             PelisplusProvider(),
             PelisplusHDProvider(),
             PeliSmartProvider(),
@@ -107,6 +109,9 @@ object APIHolder {
             //ShiroProvider(), // v2 fucked me
             AnimeFlickProvider(),
             AnimeflvnetProvider(),
+            AnimefenixProvider(),
+            AnimeflvIOProvider(),
+            JKAnimeProvider(),
             TenshiProvider(),
             WcoProvider(),
             AnimePaheProvider(),
@@ -115,6 +120,7 @@ object APIHolder {
             AnimeWorldProvider(),
             ZoroProvider(),
             DubbedAnimeProvider(),
+            MundoDonghuaProvider(),
             MonoschinosProvider(),
             KawaiifuProvider(), // disabled due to cloudflare
             NeonimeProvider(),
