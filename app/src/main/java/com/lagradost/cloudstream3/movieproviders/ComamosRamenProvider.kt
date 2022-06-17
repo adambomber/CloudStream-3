@@ -12,7 +12,7 @@ import kotlin.collections.ArrayList
 class ComamosRamenProvider : MainAPI() {
     override var mainUrl = "https://m.comamosramen.com"
     override var name = "ComamosRamen"
-    override val lang = "es"
+    override var lang = "es"
     override val hasMainPage = true
     override val hasChromecastSupport = true
     override val hasDownloadSupport = true
