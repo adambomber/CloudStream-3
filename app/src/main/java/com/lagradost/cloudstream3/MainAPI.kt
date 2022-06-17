@@ -151,25 +151,6 @@ object APIHolder {
 
 
             // All of NSFW sources
-            Javhdicu(),
-            JavSubCo(),
-            OpJavCom(),
-            Vlxx(),
-            Xvideos(),
-            Pornhub(),
-            HentaiLa(),
-            JKHentai(),
-            Hanime(),
-            HahoMoe(),
-            Pandamovie(),
-
-            // No stream links fetched
-            JavTubeWatch(),
-            JavFreeSh(),
-            JavGuru(),
-            HpJavTv(),
-            JavMost(),
-            Javclcom()
         )
 
 
