@@ -67,4 +67,4 @@ It merely scrapes 3rd-party websites that are publicly accessable via any regula
 
 ***Sites used:***
 
-Look [here](https://lagradost.github.io/CloudStream-3/) for a comprehensive list
+Look [here](https://killerdogeempire.github.io/CloudStream-3/) for a comprehensive list
