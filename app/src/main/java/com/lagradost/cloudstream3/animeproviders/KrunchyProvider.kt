@@ -75,7 +75,7 @@ class KrunchyProvider : MainAPI() {
 
     override var mainUrl = "http://www.crunchyroll.com"
     override var name: String = "Crunchyroll"
-    override val lang = "en"
+    override var lang = "en"
     override val hasQuickSearch: Boolean
         get() = false
     override val hasMainPage: Boolean
