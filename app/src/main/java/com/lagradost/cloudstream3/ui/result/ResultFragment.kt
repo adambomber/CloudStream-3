@@ -41,6 +41,7 @@ import com.google.android.material.button.MaterialButton
 import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.APIHolder.getApiFromName
 import com.lagradost.cloudstream3.APIHolder.getId
+import com.lagradost.cloudstream3.APIHolder.updateHasTrailers
 import com.lagradost.cloudstream3.AcraApplication.Companion.setKey
 import com.lagradost.cloudstream3.CommonActivity.getCastSession
 import com.lagradost.cloudstream3.CommonActivity.showToast
@@ -303,12 +304,7 @@ class ResultFragment : ResultTrailerPlayer() {
                 TvType.Cartoon -> "Cartoons/$sanitizedFileName"
                 TvType.Torrent -> "Torrent"
                 TvType.Documentary -> "Documentaries"
-                TvType.Mirror -> "Mirror"
-                TvType.Donghua -> "Donghua"
                 TvType.AsianDrama -> "AsianDrama"
-                TvType.XXX -> "NSFW"
-                TvType.JAV -> "NSFW/JAV"
-                TvType.Hentai -> "NSFW/Hentai"
             }
         }
 
@@ -607,7 +603,7 @@ class ResultFragment : ResultTrailerPlayer() {
         setFormatText(result_meta_rating, R.string.rating_format, rating?.div(1000f))
     }
 
-    var currentTrailers: List<String> = emptyList()
+    var currentTrailers: List<ExtractorLink> = emptyList()
     var currentTrailerIndex = 0
 
     override fun nextMirror() {
@@ -631,13 +627,7 @@ class ResultFragment : ResultTrailerPlayer() {
                     player.loadPlayer(
                         ctx,
                         false,
-                        ExtractorLink(
-                            "",
-                            "Trailer",
-                            trailer,
-                            "",
-                            Qualities.Unknown.value
-                        ),
+                        trailer,
                         null,
                         startPosition = 0L,
                         subtitles = emptySet(),
@@ -654,16 +644,11 @@ class ResultFragment : ResultTrailerPlayer() {
         result_trailer_loading?.isVisible = isSuccess
     }
 
-    private fun setTrailers(trailers: List<String>?) {
-        context?.let { ctx ->
-            if (ctx.isTvSettings()) return
-            val settingsManager = PreferenceManager.getDefaultSharedPreferences(ctx)
-            val showTrailers =
-                settingsManager.getBoolean(ctx.getString(R.string.show_trailers_key), true)
-            if (!showTrailers) return
-            currentTrailers = trailers ?: emptyList()
-            loadTrailer()
-        }
+    private fun setTrailers(trailers: List<ExtractorLink>?) {
+        context?.updateHasTrailers()
+        if (!LoadResponse.isTrailersEnabled) return
+        currentTrailers = trailers?.sortedBy { -it.quality } ?: emptyList()
+        loadTrailer()
     }
 
     private fun setActors(actors: List<ActorData>?) {
@@ -774,7 +759,7 @@ class ResultFragment : ResultTrailerPlayer() {
 
         player_open_source?.setOnClickListener {
             currentTrailers.getOrNull(currentTrailerIndex)?.let {
-                context?.openBrowser(it)
+                context?.openBrowser(it.url)
             }
         }
 
@@ -787,6 +772,7 @@ class ResultFragment : ResultTrailerPlayer() {
 
         activity?.window?.decorView?.clearFocus()
         hideKeyboard()
+        context?.updateHasTrailers()
         activity?.loadCache()
 
         activity?.fixPaddingStatusbar(result_top_bar)
@@ -1001,6 +987,7 @@ class ResultFragment : ResultTrailerPlayer() {
                 }
                 ACTION_CHROME_CAST_EPISODE -> requireLinks(true)
                 ACTION_CHROME_CAST_MIRROR -> requireLinks(true)
+                ACTION_SHOW_DESCRIPTION -> true
                 else -> requireLinks(false)
             }
             if (!isLoaded) return@main // CANT LOAD
@@ -1008,6 +995,14 @@ class ResultFragment : ResultTrailerPlayer() {
             when (episodeClick.action) {
                 ACTION_SHOW_TOAST -> {
                     showToast(activity, R.string.play_episode_toast, Toast.LENGTH_SHORT)
+                }
+
+                ACTION_SHOW_DESCRIPTION -> {
+                    val builder: AlertDialog.Builder =
+                        AlertDialog.Builder(requireContext(), R.style.AlertDialogCustom)
+                    builder.setMessage(episodeClick.data.description ?: return@main)
+                        .setTitle(R.string.torrent_plot)
+                        .show()
                 }
 
                 ACTION_CLICK_DEFAULT -> {
@@ -1433,6 +1428,7 @@ class ResultFragment : ResultTrailerPlayer() {
 
         observe(syncModel.syncIds) {
             syncdata = it
+            println("syncdata: $syncdata")
         }
 
         var currentSyncProgress = 0
@@ -1457,7 +1453,7 @@ class ResultFragment : ResultTrailerPlayer() {
                     val d = meta.value
                     result_sync_episodes?.progress = currentSyncProgress * 1000
                     setSyncMaxEpisodes(d.totalEpisodes)
-                    viewModel.setMeta(d)
+                    viewModel.setMeta(d, syncdata)
                 }
                 is Resource.Loading -> {
                     result_sync_max_episodes?.text =
@@ -1656,12 +1652,7 @@ class ResultFragment : ResultTrailerPlayer() {
         }
 
         observe(viewModel.dubStatus) { status ->
-            val dubstatusName = if (status.name == "Subbed") getString(R.string.dub_status_subbed)
-            else if (status.name == "Dubbed") getString(R.string.dub_status_dubbed)
-            else if (status.name == "PremiumDub") getString(R.string.dub_status_premium)
-            else if (status.name == "PremiumSub") getString(R.string.sub_status_premium)
-            else ""
-            result_dub_select?.text = dubstatusName
+            result_dub_select?.text = status.toString()
         }
 
 //        val preferDub = context?.getApiDubstatusSettings()?.all { it == DubStatus.Dubbed } == true
@@ -1693,14 +1684,9 @@ class ResultFragment : ResultTrailerPlayer() {
             if (ranges != null) {
                 it.popupMenuNoIconsAndNoStringRes(ranges
                     .map { status ->
-                        val dubstatusName = if (status.name == "Subbed") getString(R.string.dub_status_subbed)
-                        else if (status.name == "Dubbed") getString(R.string.dub_status_dubbed)
-                        else if (status.name == "PremiumDub") getString(R.string.dub_status_premium)
-                        else if (status.name == "PremiumSub") getString(R.string.sub_status_premium)
-                        else ""
                         Pair(
                             status.ordinal,
-                            dubstatusName
+                            status.toString()
                         )
                     }
                     .toList()) {
@@ -2083,12 +2069,7 @@ class ResultFragment : ResultTrailerPlayer() {
                             TvType.Documentary -> R.string.documentaries_singular
                             TvType.Movie -> R.string.movies_singular
                             TvType.Torrent -> R.string.torrent_singular
-                            TvType.Mirror -> R.string.mirror_singular
-                            TvType.Donghua -> R.string.donghua_singular
                             TvType.AsianDrama -> R.string.asian_drama_singular
-                            TvType.JAV -> R.string.jav
-                            TvType.Hentai -> R.string.hentai
-                            TvType.XXX -> R.string.xxx
                         }
                     )?.let {
                         result_meta_type?.text = it
