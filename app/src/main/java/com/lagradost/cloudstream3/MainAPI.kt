@@ -241,6 +241,7 @@ object APIHolder {
             this.getString(R.string.search_providers_list_key),
             hashSet
         )?.toHashSet() ?: hashSet
+
         val list = HashSet<String>()
         for (name in set) {
             val api = getApiFromNameNull(name) ?: continue

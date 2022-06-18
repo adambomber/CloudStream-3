@@ -370,6 +370,7 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
     fun test() {
         /*thread {
             val youtubeLink = "https://www.youtube.com/watch?v=Zxem9rqJ5S0"
+
             val url = YoutubeStreamLinkHandlerFactory.getInstance().fromUrl(youtubeLink)
             println("ID:::: ${url.id}")
             NewPipe.init(DownloaderTestImpl.getInstance())
@@ -378,6 +379,7 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
                 service,
                 url
             ) {
+
             }
             s.fetchPage()
             val streams = s.videoStreams
@@ -385,6 +387,7 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
         }*/
         /*
         runBlocking {
+
             val query = """
             query {
                 searchShows(search: "spider", limit: 10) {
@@ -658,15 +661,19 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
         } else {
             val keys = getKeys(VideoDownloadManager.KEY_RESUME_PACKAGES)
             val resumePkg = keys.mapNotNull { k -> getKey<VideoDownloadManager.DownloadResumePackage>(k) }
+
             // To remove a bug where this is permanent
             removeKeys(VideoDownloadManager.KEY_RESUME_PACKAGES)
+
             for (pkg in resumePkg) { // ADD ALL CURRENT DOWNLOADS
                 VideoDownloadManager.downloadFromResume(this, pkg, false)
             }
+
             // ADD QUEUE
             // array needed because List gets cast exception to linkedList for some unknown reason
             val resumeQueue =
                 getKey<Array<VideoDownloadManager.DownloadQueueResumePackage>>(VideoDownloadManager.KEY_RESUME_QUEUE_PACKAGES)
+
             resumeQueue?.sortedBy { it.index }?.forEach {
                 VideoDownloadManager.downloadFromResume(this, it.pkg)
             }
@@ -693,6 +700,7 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
                 if(!isCasting) {
                     val castPlayer = CastPlayer(castContext)
                     println("LOAD ITEM")
+
                     castPlayer.loadItem(buildMediaQueueItem("https://cdn.discordapp.com/attachments/551382684560261121/730169809408622702/ChromecastLogo6.png"),0)
                 }
             }
@@ -740,6 +748,7 @@ class MainActivity : AppCompatActivity(), ColorPickerDialogListener {
         val displayName = "output.dex" //""output.dex"
         val file =  getExternalFilesDir(null)?.absolutePath + File.separatorChar + displayName//"${Environment.getExternalStorageDirectory()}${File.separatorChar}$relativePath$displayName"
         println(file)
+
         val realFile = File(file)
         println("REAALFILE: ${realFile.exists()} at ${realFile.length()}"  )
         val src = ExtensionManager.getSourceFromDex(this, "com.example.testdex2.TestClassToDex", File(file))
