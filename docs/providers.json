@@ -101,12 +101,6 @@
         "status": 1,
         "url": "https://cinecalidad.lol"
     },
-    "ComamosRamenProvider": {
-        "language": "es",
-        "name": "ComamosRamen",
-        "status": 1,
-        "url": "https://m.comamosramen.com"
-    },
     "CuevanaProvider": {
         "language": "es",
         "name": "Cuevana",
@@ -196,12 +190,6 @@
         "status": 1,
         "url": "https://www.filmpertutti.buzz"
     },
-    "FmoviesAPPProvider": {
-        "language": "en",
-        "name": "Fmovies",
-        "status": 1,
-        "url": "https://fmovies.app"
-    },
     "FmoviesToProvider": {
         "language": "en",
         "name": "Fmovies.to",
@@ -261,12 +249,6 @@
         "name": "KDramaHood",
         "status": 1,
         "url": "https://kdramahood.com"
-    },
-    "KrunchyProvider": {
-        "language": "en",
-        "name": "Crunchyroll",
-        "status": 1,
-        "url": "http://www.crunchyroll.com"
     },
     "KuramanimeProvider": {
         "language": "id",
@@ -379,12 +361,6 @@
         "name": "Pelisplus",
         "status": 1,
         "url": "https://pelisplus.icu"
-    },
-    "PelisplusSOProvider": {
-        "language": "es",
-        "name": "Pelisplus.so",
-        "status": 1,
-        "url": "https://pelisplus.so"
     },
     "PinoyHDXyzProvider": {
         "language": "tl",
