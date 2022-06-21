@@ -1,17 +1,11 @@
 package com.lagradost.cloudstream3.ui.player
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.util.SparseArray
 import android.widget.FrameLayout
-import androidx.core.util.forEach
-import at.huber.youtubeExtractor.VideoMeta
-import at.huber.youtubeExtractor.YouTubeExtractor
-import at.huber.youtubeExtractor.YtFile
 import com.google.android.exoplayer2.*
 import com.google.android.exoplayer2.database.StandaloneDatabaseProvider
 import com.google.android.exoplayer2.ext.okhttp.OkHttpDataSource
@@ -31,7 +25,6 @@ import com.google.android.exoplayer2.upstream.cache.SimpleCache
 import com.google.android.exoplayer2.util.MimeTypes
 import com.google.android.exoplayer2.video.VideoSize
 import com.lagradost.cloudstream3.APIHolder.getApiFromName
-import com.lagradost.cloudstream3.ErrorLoadingException
 import com.lagradost.cloudstream3.USER_AGENT
 import com.lagradost.cloudstream3.app
 import com.lagradost.cloudstream3.mvvm.logError
@@ -39,7 +32,6 @@ import com.lagradost.cloudstream3.mvvm.normalSafeApiCall
 import com.lagradost.cloudstream3.ui.subtitles.SaveCaptionStyle
 import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.ExtractorUri
-import com.lagradost.cloudstream3.utils.Qualities
 import com.lagradost.cloudstream3.utils.SubtitleHelper.fromTwoLettersToLanguage
 import java.io.File
 import javax.net.ssl.HttpsURLConnection
@@ -195,6 +187,9 @@ class CS3IPlayer : IPlayer {
     }
 
     var currentSubtitles: SubtitleData? = null
+    /**
+     * @return True if the player should be reloaded
+     * */
     override fun setPreferredSubtitles(subtitle: SubtitleData?): Boolean {
         Log.i(TAG, "setPreferredSubtitles init $subtitle")
         currentSubtitles = subtitle
@@ -210,7 +205,6 @@ class CS3IPlayer : IPlayer {
                     SubtitleStatus.REQUIRES_RELOAD -> {
                         Log.i(TAG, "setPreferredSubtitles REQUIRES_RELOAD")
                         return@let true
-                        // reloadPlayer(context)
                     }
                     SubtitleStatus.IS_ACTIVE -> {
                         Log.i(TAG, "setPreferredSubtitles IS_ACTIVE")
@@ -235,7 +229,6 @@ class CS3IPlayer : IPlayer {
                         //}
                     }
                     SubtitleStatus.NOT_FOUND -> {
-                        // not found
                         Log.i(TAG, "setPreferredSubtitles NOT_FOUND")
                         return@let true
                     }
@@ -277,7 +270,7 @@ class CS3IPlayer : IPlayer {
         subtitleHelper.setSubStyle(style)
     }
 
-    private fun saveData() {
+    override fun saveData() {
         Log.i(TAG, "saveData")
         updatedTime()
 
@@ -307,14 +300,14 @@ class CS3IPlayer : IPlayer {
 
         saveData()
         exoPlayer?.pause()
-        releasePlayer()
+        //releasePlayer()
     }
 
     override fun onPause() {
         Log.i(TAG, "onPause")
         saveData()
         exoPlayer?.pause()
-        releasePlayer()
+        //releasePlayer()
     }
 
     override fun onResume(context: Context) {
@@ -332,7 +325,6 @@ class CS3IPlayer : IPlayer {
     }
 
     companion object {
-        private var ytVideos: MutableMap<String, YtFile> = mutableMapOf()
         private var simpleCache: SimpleCache? = null
 
         var requestSubtitleUpdate: (() -> Unit)? = null
@@ -520,6 +512,7 @@ class CS3IPlayer : IPlayer {
                     mediaItem
                 )
 
+            println("PLAYBACK POS $playbackPosition")
             return exoPlayerBuilder.build().apply {
                 setPlayWhenReady(playWhenReady)
                 seekTo(currentWindow, playbackPosition)
@@ -531,7 +524,6 @@ class CS3IPlayer : IPlayer {
                 )
                 setHandleAudioBecomingNoisy(true)
                 setPlaybackSpeed(playBackSpeed)
-
             }
         }
     }
@@ -708,7 +700,7 @@ class CS3IPlayer : IPlayer {
                     if (playWhenReady) {
                         when (playbackState) {
                             Player.STATE_READY -> {
-                                requestAutoFocus?.invoke()
+
                             }
                             Player.STATE_ENDED -> {
                                 handleEvent(CSPlayerEvent.NextEpisode)
@@ -737,6 +729,7 @@ class CS3IPlayer : IPlayer {
                 override fun onIsPlayingChanged(isPlaying: Boolean) {
                     super.onIsPlayingChanged(isPlaying)
                     if (isPlaying) {
+                        requestAutoFocus?.invoke()
                         onRenderFirst()
                     }
                 }
@@ -745,7 +738,7 @@ class CS3IPlayer : IPlayer {
                     super.onPlaybackStateChanged(playbackState)
                     when (playbackState) {
                         Player.STATE_READY -> {
-                            requestAutoFocus?.invoke()
+
                         }
                         Player.STATE_ENDED -> {
                             handleEvent(CSPlayerEvent.NextEpisode)
@@ -883,57 +876,9 @@ class CS3IPlayer : IPlayer {
         return Pair(subSources, activeSubtitles)
     }
 
-
-    fun loadYtFile(context: Context, yt: YtFile) {
-        loadOnlinePlayer(
-            context,
-            ExtractorLink(
-                "YouTube",
-                "",
-                yt.url,
-                "",
-                yt.format?.height ?: Qualities.Unknown.value
-            )
-        )
-    }
-
     private fun loadOnlinePlayer(context: Context, link: ExtractorLink) {
         Log.i(TAG, "loadOnlinePlayer $link")
         try {
-            if (link.url.contains("youtube.com")) {
-                val ytLink = link.url.replace("/embed/", "/watch?v=")
-                ytVideos[ytLink]?.let {
-                    loadYtFile(context, it)
-                    return
-                }
-                val ytExtractor =
-                    @SuppressLint("StaticFieldLeak")
-                    object : YouTubeExtractor(context) {
-                        override fun onExtractionComplete(
-                            ytFiles: SparseArray<YtFile>?,
-                            videoMeta: VideoMeta?
-                        ) {
-                            var yt: YtFile? = null
-                            ytFiles?.forEach { _, value ->
-                                if ((yt?.format?.height ?: 0) < (value.format?.height
-                                        ?: -1) && (value.format?.audioBitrate ?: -1) > 0
-                                ) {
-                                    yt = value
-                                }
-                            }
-                            yt?.let { ytf ->
-                                ytVideos[ytLink] = ytf
-                                loadYtFile(context, ytf)
-                            } ?: run {
-                                playerError?.invoke(ErrorLoadingException("No Link"))
-                            }
-                        }
-                    }
-                Log.i(TAG, "YouTube extraction on $ytLink")
-                ytExtractor.extract(ytLink)
-                return
-            }
-
             currentLink = link
 
             if (ignoreSSL) {

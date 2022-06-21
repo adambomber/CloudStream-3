@@ -17,8 +17,10 @@ import com.lagradost.cloudstream3.mvvm.logError
 import com.lagradost.cloudstream3.syncproviders.AccountManager.Companion.aniListApi
 import com.lagradost.cloudstream3.syncproviders.AccountManager.Companion.malApi
 import com.lagradost.cloudstream3.ui.player.SubtitleData
+import com.lagradost.cloudstream3.ui.settings.SettingsFragment.Companion.isTvSettings
 import com.lagradost.cloudstream3.utils.AppUtils.toJson
 import com.lagradost.cloudstream3.utils.ExtractorLink
+import com.lagradost.cloudstream3.utils.loadExtractor
 import okhttp3.Interceptor
 import java.text.SimpleDateFormat
 import java.util.*
@@ -90,6 +92,7 @@ object APIHolder {
             TantifilmProvider(),
             CineblogProvider(),
             AltadefinizioneProvider(),
+            FilmpertuttiProvider(),
             HDMovie5(),
             RebahinProvider(),
             LayarKacaProvider(),
@@ -295,6 +298,16 @@ object APIHolder {
         if (realSet.isEmpty()) return hashSet
 
         return realSet
+    }
+
+    fun Context.updateHasTrailers() {
+        LoadResponse.isTrailersEnabled = getHasTrailers()
+    }
+
+    private fun Context.getHasTrailers(): Boolean {
+        if (this.isTvSettings()) return false
+        val settingsManager = PreferenceManager.getDefaultSharedPreferences(this)
+        return settingsManager.getBoolean(this.getString(R.string.show_trailers_key), true)
     }
 
     fun Context.filterProviderByPreferredMedia(hasHomePageIsRequired: Boolean = true): List<MainAPI> {
@@ -854,7 +867,7 @@ interface LoadResponse {
     var rating: Int? // 0-10000
     var tags: List<String>?
     var duration: Int? // in minutes
-    var trailers: List<String>?
+    var trailers: List<ExtractorLink>?
     var recommendations: List<SearchResponse>?
     var actors: List<ActorData>?
     var comingSoon: Boolean
@@ -864,6 +877,7 @@ interface LoadResponse {
     companion object {
         private val malIdPrefix = malApi.idPrefix
         private val aniListIdPrefix = aniListApi.idPrefix
+        var isTrailersEnabled = true
 
         @JvmName("addActorNames")
         fun LoadResponse.addActors(actors: List<String>?) {
@@ -885,6 +899,14 @@ interface LoadResponse {
             this.actors = actors?.map { actor -> ActorData(actor) }
         }
 
+        fun LoadResponse.getMalId(): String? {
+            return this.syncData[malIdPrefix]
+        }
+
+        fun LoadResponse.getAniListId(): String? {
+            return this.syncData[aniListIdPrefix]
+        }
+
         fun LoadResponse.addMalId(id: Int?) {
             this.syncData[malIdPrefix] = (id ?: return).toString()
         }
@@ -897,27 +919,38 @@ interface LoadResponse {
             addImdbId(imdbUrlToIdNullable(url))
         }
 
-        /**better to set trailers directly instead of calling this multiple times*/
-        fun LoadResponse.addTrailer(trailerUrl: String?) {
-            if (trailerUrl == null) return
+        /**better to call addTrailer with mutible trailers directly instead of calling this multiple times*/
+        suspend fun LoadResponse.addTrailer(trailerUrl: String?, referer: String? = null) {
+            if (!isTrailersEnabled || trailerUrl == null) return
+            try {
+                val newTrailers = loadExtractor(trailerUrl, referer)
+                addTrailer(newTrailers)
+            } catch (e: Exception) {
+                logError(e)
+            }
+        }
+
+        fun LoadResponse.addTrailer(newTrailers: List<ExtractorLink>) {
             if (this.trailers == null) {
-                this.trailers = listOf(trailerUrl)
+                this.trailers = newTrailers
             } else {
-                val update = this.trailers?.toMutableList()
-                update?.add(trailerUrl)
+                val update = this.trailers?.toMutableList() ?: mutableListOf()
+                update.addAll(newTrailers)
                 this.trailers = update
             }
         }
 
-        fun LoadResponse.addTrailer(trailerUrls: List<String>?) {
-            if (trailerUrls == null) return
-            if (this.trailers == null) {
-                this.trailers = trailerUrls
-            } else {
-                val update = this.trailers?.toMutableList()
-                update?.addAll(trailerUrls)
-                this.trailers = update
-            }
+        suspend fun LoadResponse.addTrailer(trailerUrls: List<String>?, referer: String? = null) {
+            if (!isTrailersEnabled || trailerUrls == null) return
+            val newTrailers = trailerUrls.apmap { trailerUrl ->
+                try {
+                    loadExtractor(trailerUrl, referer)
+                } catch (e: Exception) {
+                    logError(e)
+                    emptyList()
+                }
+            }.flatten().distinct()
+            addTrailer(newTrailers)
         }
 
         fun LoadResponse.addImdbId(id: String?) {
@@ -971,7 +1004,7 @@ interface LoadResponse {
 
 fun LoadResponse?.isEpisodeBased(): Boolean {
     if (this == null) return false
-    return (this is AnimeLoadResponse || this is TvSeriesLoadResponse) && this.type.isEpisodeBased()
+    return this is EpisodeResponse && this.type.isEpisodeBased()
 }
 
 fun LoadResponse?.isAnimeBased(): Boolean {
@@ -982,6 +1015,17 @@ fun LoadResponse?.isAnimeBased(): Boolean {
 fun TvType?.isEpisodeBased(): Boolean {
     if (this == null) return false
     return (this == TvType.TvSeries || this == TvType.Anime)
+}
+
+
+data class NextAiring(
+    val episode: Int,
+    val unixTime: Long,
+)
+
+interface EpisodeResponse {
+    var showStatus: ShowStatus?
+    var nextAiring: NextAiring?
 }
 
 data class TorrentLoadResponse(
@@ -997,7 +1041,7 @@ data class TorrentLoadResponse(
     override var rating: Int? = null,
     override var tags: List<String>? = null,
     override var duration: Int? = null,
-    override var trailers: List<String>? = null,
+    override var trailers: List<ExtractorLink>? = null,
     override var recommendations: List<SearchResponse>? = null,
     override var actors: List<ActorData>? = null,
     override var comingSoon: Boolean = false,
@@ -1017,7 +1061,7 @@ data class AnimeLoadResponse(
     override var year: Int? = null,
 
     var episodes: MutableMap<DubStatus, List<Episode>> = mutableMapOf(),
-    var showStatus: ShowStatus? = null,
+    override var showStatus: ShowStatus? = null,
 
     override var plot: String? = null,
     override var tags: List<String>? = null,
@@ -1025,25 +1069,26 @@ data class AnimeLoadResponse(
 
     override var rating: Int? = null,
     override var duration: Int? = null,
-    override var trailers: List<String>? = null,
+    override var trailers: List<ExtractorLink>? = null,
     override var recommendations: List<SearchResponse>? = null,
     override var actors: List<ActorData>? = null,
     override var comingSoon: Boolean = false,
     override var syncData: MutableMap<String, String> = mutableMapOf(),
     override var posterHeaders: Map<String, String>? = null,
-) : LoadResponse
+    override var nextAiring: NextAiring? = null,
+) : LoadResponse, EpisodeResponse
 
 fun AnimeLoadResponse.addEpisodes(status: DubStatus, episodes: List<Episode>?) {
     if (episodes == null) return
     this.episodes[status] = episodes
 }
 
-fun MainAPI.newAnimeLoadResponse(
+suspend fun MainAPI.newAnimeLoadResponse(
     name: String,
     url: String,
     type: TvType,
     comingSoonIfNone: Boolean = true,
-    initializer: AnimeLoadResponse.() -> Unit = { },
+    initializer: suspend AnimeLoadResponse.() -> Unit = { },
 ): AnimeLoadResponse {
     val builder = AnimeLoadResponse(name = name, url = url, apiName = this.name, type = type)
     builder.initializer()
@@ -1072,7 +1117,7 @@ data class MovieLoadResponse(
     override var rating: Int? = null,
     override var tags: List<String>? = null,
     override var duration: Int? = null,
-    override var trailers: List<String>? = null,
+    override var trailers: List<ExtractorLink>? = null,
     override var recommendations: List<SearchResponse>? = null,
     override var actors: List<ActorData>? = null,
     override var comingSoon: Boolean = false,
@@ -1080,12 +1125,12 @@ data class MovieLoadResponse(
     override var posterHeaders: Map<String, String>? = null,
 ) : LoadResponse
 
-fun <T> MainAPI.newMovieLoadResponse(
+suspend fun <T> MainAPI.newMovieLoadResponse(
     name: String,
     url: String,
     type: TvType,
     data: T?,
-    initializer: MovieLoadResponse.() -> Unit = { }
+    initializer: suspend MovieLoadResponse.() -> Unit = { }
 ): MovieLoadResponse {
     // just in case
     if (data is String) return newMovieLoadResponse(
@@ -1108,12 +1153,12 @@ fun <T> MainAPI.newMovieLoadResponse(
     return builder
 }
 
-fun MainAPI.newMovieLoadResponse(
+suspend fun MainAPI.newMovieLoadResponse(
     name: String,
     url: String,
     type: TvType,
     dataUrl: String,
-    initializer: MovieLoadResponse.() -> Unit = { }
+    initializer: suspend MovieLoadResponse.() -> Unit = { }
 ): MovieLoadResponse {
     val builder = MovieLoadResponse(
         name = name,
@@ -1189,24 +1234,25 @@ data class TvSeriesLoadResponse(
     override var year: Int? = null,
     override var plot: String? = null,
 
-    var showStatus: ShowStatus? = null,
+    override var showStatus: ShowStatus? = null,
     override var rating: Int? = null,
     override var tags: List<String>? = null,
     override var duration: Int? = null,
-    override var trailers: List<String>? = null,
+    override var trailers: List<ExtractorLink>? = null,
     override var recommendations: List<SearchResponse>? = null,
     override var actors: List<ActorData>? = null,
     override var comingSoon: Boolean = false,
     override var syncData: MutableMap<String, String> = mutableMapOf(),
     override var posterHeaders: Map<String, String>? = null,
-) : LoadResponse
+    override var nextAiring: NextAiring? = null,
+) : LoadResponse, EpisodeResponse
 
-fun MainAPI.newTvSeriesLoadResponse(
+suspend fun MainAPI.newTvSeriesLoadResponse(
     name: String,
     url: String,
     type: TvType,
     episodes: List<Episode>,
-    initializer: TvSeriesLoadResponse.() -> Unit = { }
+    initializer: suspend TvSeriesLoadResponse.() -> Unit = { }
 ): TvSeriesLoadResponse {
     val builder = TvSeriesLoadResponse(
         name = name,
