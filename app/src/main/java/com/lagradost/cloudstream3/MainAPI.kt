@@ -10,11 +10,9 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.json.JsonMapper
 import com.fasterxml.jackson.module.kotlin.KotlinModule
-import com.lagradost.cloudstream3.LoadResponse.Companion.addMalId
 import com.lagradost.cloudstream3.animeproviders.*
 import com.lagradost.cloudstream3.metaproviders.CrossTmdbProvider
 import com.lagradost.cloudstream3.movieproviders.*
-import com.lagradost.cloudstream3.providersnsfw.*
 import com.lagradost.cloudstream3.mvvm.logError
 import com.lagradost.cloudstream3.syncproviders.AccountManager.Companion.aniListApi
 import com.lagradost.cloudstream3.syncproviders.AccountManager.Companion.malApi
@@ -94,7 +92,6 @@ object APIHolder {
             TantifilmProvider(),
             CineblogProvider(),
             AltadefinizioneProvider(),
-            FilmpertuttiProvider(),
             HDMovie5(),
             RebahinProvider(),
             LayarKacaProvider(),
@@ -136,41 +133,6 @@ object APIHolder {
             //MultiAnimeProvider(),
             NginxProvider(),
             OlgplyProvider(),
-
-            // Additional anime providers
-            KrunchyProvider(),
-
-            // Additional movie providers
-            ComamosRamenProvider(),
-            ElifilmsProvider(),
-            EstrenosDoramasProvider(),
-            FmoviesAPPProvider(),
-            PelisplusSOProvider(),
-            YesMoviesProvider(),
-            HDTodayProvider(),
-            MoviesJoyProvider(),
-            MyflixerToProvider(),
-
-            // All of NSFW sources
-            Javhdicu(),
-            JavSubCo(),
-            OpJavCom(),
-            Vlxx(),
-            Xvideos(),
-            Pornhub(),
-            HentaiLa(),
-            JKHentai(),
-            Hanime(),
-            HahoMoe(),
-            Pandamovie(),
-
-            // No stream links fetched
-            JavTubeWatch(),
-            JavFreeSh(),
-            JavGuru(),
-            HpJavTv(),
-            JavMost(),
-            Javclcom()
         )
 
 
@@ -354,26 +316,18 @@ object APIHolder {
         val langs = this.getApiProviderLangSettings()
         val allApis = apis.filter { langs.contains(it.lang) }
             .filter { api -> api.hasMainPage || !hasHomePageIsRequired }
-        return if (currentPrefMedia < 0) {
+        return if (currentPrefMedia < 1) {
             allApis
         } else {
             // Filter API depending on preferred media type
             val listEnumAnime = listOf(TvType.Anime, TvType.AnimeMovie, TvType.OVA)
             val listEnumMovieTv =
                 listOf(TvType.Movie, TvType.TvSeries, TvType.Cartoon, TvType.AsianDrama)
-            val listEnumAnimeMovieTV =
-                listOf(TvType.Anime, TvType.AnimeMovie, TvType.OVA, TvType.Movie, TvType.TvSeries, TvType.Cartoon, TvType.AsianDrama, TvType.Mirror, TvType.Donghua)
-            val listEnumAnimeMovieTvNSFW =
-                listOf(TvType.Anime, TvType.AnimeMovie, TvType.OVA, TvType.Movie, TvType.TvSeries, TvType.Cartoon, TvType.AsianDrama, TvType.Mirror, TvType.Donghua, TvType.JAV, TvType.Hentai, TvType.XXX)
             val listEnumDoc = listOf(TvType.Documentary)
-            val listEnumNSFW = listOf(TvType.JAV, TvType.Hentai, TvType.XXX)
             val mediaTypeList = when (currentPrefMedia) {
-                1 -> listEnumAnimeMovieTvNSFW
-                2 -> listEnumMovieTv
-                3 -> listEnumAnime
-                4 -> listEnumDoc
-                5 -> listEnumNSFW
-                else -> listEnumAnimeMovieTV
+                2 -> listEnumAnime
+                3 -> listEnumDoc
+                else -> listEnumMovieTv
             }
             allApis.filter { api -> api.supportedTypes.any { it in mediaTypeList } }
         }
@@ -617,10 +571,8 @@ enum class ShowStatus {
 }
 
 enum class DubStatus(val id: Int) {
+    Dubbed(1),
     Subbed(0),
-    PremiumSub(1),
-    Dubbed(2),
-    PremiumDub(3),
 }
 
 enum class TvType {
@@ -632,12 +584,7 @@ enum class TvType {
     OVA,
     Torrent,
     Documentary,
-    Mirror,
-    Donghua,
     AsianDrama,
-    JAV,
-    Hentai,
-    XXX
 }
 
 // IN CASE OF FUTURE ANIME MOVIE OR SMTH
@@ -647,7 +594,7 @@ fun TvType.isMovieType(): Boolean {
 
 // returns if the type has an anime opening
 fun TvType.isAnimeOp(): Boolean {
-    return this == TvType.Anime || this == TvType.OVA || this == TvType.Donghua
+    return this == TvType.Anime || this == TvType.OVA
 }
 
 data class SubtitleFile(val lang: String, val url: String)
@@ -951,11 +898,11 @@ interface LoadResponse {
             this.actors = actors?.map { actor -> ActorData(actor) }
         }
 
-        fun LoadResponse.getMalId() : String? {
+        fun LoadResponse.getMalId(): String? {
             return this.syncData[malIdPrefix]
         }
 
-        fun LoadResponse.getAniListId() : String? {
+        fun LoadResponse.getAniListId(): String? {
             return this.syncData[aniListIdPrefix]
         }
 
@@ -1056,7 +1003,7 @@ interface LoadResponse {
 
 fun LoadResponse?.isEpisodeBased(): Boolean {
     if (this == null) return false
-    return (this is AnimeLoadResponse || this is TvSeriesLoadResponse) && this.type.isEpisodeBased()
+    return this is EpisodeResponse && this.type.isEpisodeBased()
 }
 
 fun LoadResponse?.isAnimeBased(): Boolean {
@@ -1067,6 +1014,17 @@ fun LoadResponse?.isAnimeBased(): Boolean {
 fun TvType?.isEpisodeBased(): Boolean {
     if (this == null) return false
     return (this == TvType.TvSeries || this == TvType.Anime)
+}
+
+
+data class NextAiring(
+    val episode: Int,
+    val unixTime: Long,
+)
+
+interface EpisodeResponse {
+    var showStatus: ShowStatus?
+    var nextAiring: NextAiring?
 }
 
 data class TorrentLoadResponse(
@@ -1102,7 +1060,7 @@ data class AnimeLoadResponse(
     override var year: Int? = null,
 
     var episodes: MutableMap<DubStatus, List<Episode>> = mutableMapOf(),
-    var showStatus: ShowStatus? = null,
+    override var showStatus: ShowStatus? = null,
 
     override var plot: String? = null,
     override var tags: List<String>? = null,
@@ -1116,7 +1074,8 @@ data class AnimeLoadResponse(
     override var comingSoon: Boolean = false,
     override var syncData: MutableMap<String, String> = mutableMapOf(),
     override var posterHeaders: Map<String, String>? = null,
-) : LoadResponse
+    override var nextAiring: NextAiring? = null,
+) : LoadResponse, EpisodeResponse
 
 fun AnimeLoadResponse.addEpisodes(status: DubStatus, episodes: List<Episode>?) {
     if (episodes == null) return
@@ -1274,7 +1233,7 @@ data class TvSeriesLoadResponse(
     override var year: Int? = null,
     override var plot: String? = null,
 
-    var showStatus: ShowStatus? = null,
+    override var showStatus: ShowStatus? = null,
     override var rating: Int? = null,
     override var tags: List<String>? = null,
     override var duration: Int? = null,
@@ -1284,7 +1243,8 @@ data class TvSeriesLoadResponse(
     override var comingSoon: Boolean = false,
     override var syncData: MutableMap<String, String> = mutableMapOf(),
     override var posterHeaders: Map<String, String>? = null,
-) : LoadResponse
+    override var nextAiring: NextAiring? = null,
+) : LoadResponse, EpisodeResponse
 
 suspend fun MainAPI.newTvSeriesLoadResponse(
     name: String,
