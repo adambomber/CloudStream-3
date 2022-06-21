@@ -3,16 +3,15 @@ package com.lagradost.cloudstream3.extractors
 import com.lagradost.cloudstream3.app
 import com.lagradost.cloudstream3.utils.*
 
-class MixDropTo: MixDrop() {
-    override var mainUrl: String = "https://mixdrop.to"
-}
-
 class MixDropBz : MixDrop(){
     override var mainUrl = "https://mixdrop.bz"
 }
 
 class MixDropCh : MixDrop(){
     override var mainUrl = "https://mixdrop.ch"
+}
+class MixDropTo : MixDrop(){
+    override var mainUrl = "https://mixdrop.to"
 }
 
 open class MixDrop : ExtractorApi() {
