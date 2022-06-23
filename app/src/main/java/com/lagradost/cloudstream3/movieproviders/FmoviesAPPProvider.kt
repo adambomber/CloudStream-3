@@ -22,6 +22,7 @@ import com.lagradost.nicehttp.NiceResponse
 class FmoviesAPPProvider : MainAPI() {
     override var mainUrl = "https://fmovies.app"
     override var name = "Fmovies"
+    override var lang = "en"
 
     override val hasQuickSearch = false
     override val hasMainPage = true
